@@ -1,0 +1,41 @@
+<% layout('layout/boilerplate') %>
+   
+    <h1>Create your Journal entry</h1>
+    <form action="/entries" method="post" novalidate class="validated-form">
+<div>
+<label for="name">Title</label>
+        <input type="text" placeholder="Title" name="entry[title]" id="title" required class="form-control">
+</div>
+
+<div>
+<label for="author">Author</label>
+        <input type="text" placeholder="author" name="entry[author]" id="author"  required  class="form-control">
+</div>
+        
+<div>
+<label for="content">Content</label>
+        <input type="text" placeholder="Content" name="entry[content]" id="content"  required  class="form-control">
+</div>
+<div>
+<label for="image">Image url</label>
+        <input type="text" placeholder="image" name="entry[image]" id="image"   required  class="form-control">
+</div>
+<div>
+<label for="tags">Tag</label>
+        <input type="text" placeholder="tags" name="entry[tags]" id="tags"  required  class="form-control">
+</div>
+<div>
+<label for="verse">Scripture</label>
+        <input type="text" placeholder="verse" name="entry[verse]" id="verse"  required  class="form-control">
+</div>
+<div>
+<input type="checkbox" name="entry[isPublic]" id="isPublic">
+<label for="isPublic">Make this entry public</label>
+</div>
+
+        <button class="btn btn-success" >Submit</button>
+    </form>
+
+     <footer>
+    <a href="/entries"> All Entries</a>
+  </footer>
