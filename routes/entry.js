@@ -36,6 +36,7 @@ router.post ('/' ,validateEntry, catchAsync (async (req , res , next) =>{
     entryData.isPublic = entryData.isPublic === 'on' // 👈 convert 'on' to true
     const entries = new Journex(entryData)
     await entries.save()
+     req.flash('success' , 'succesfully made a new entry')
     res.redirect (`/entries/${entries._id}`)
     
 }))
