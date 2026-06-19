@@ -43,11 +43,19 @@ router.post ('/' ,validateEntry, catchAsync (async (req , res , next) =>{
 
 router.get('/:id' , catchAsync( async(req , res) =>{
     const entries = await Journex.findById(req.params.id).populate('comment')
+    if(!entries){
+        req.flash('error' , 'Cannot find this campground')
+       return res.redirect('/entries')
+    }
     res.render('show' , {entries})
 } ))
 
 router.get('/:id/edit' , catchAsync(async (req , res) =>{
      const entries = await Journex.findById(req.params.id)
+     if(!entries){
+        req.flash('error' , 'Cannot find this campground')
+       return res.redirect('/entries')
+    }
     res.render('edit' , {entries})
 
 }))
@@ -57,12 +65,14 @@ router.put ('/:id' , validateEntry, catchAsync(async (req , res) =>{
     const entryData = req.body.entry
     entryData.isPublic = entryData.isPublic === 'on' // 👈 convert 'on' to true
     const entries = await Journex.findByIdAndUpdate(id , {...entryData})
+     req.flash('success' , 'succesfully updated this entry')
      res.redirect (`/entries/${entries._id}`)
 }))
 
 router.delete('/:id' , catchAsync(async (req , res) =>{
     const {id} = req.params
     const entries = await Journex.findByIdAndDelete(id)
+     req.flash('success' , 'succesfully deleted this entry')
      res.redirect ('/entries');
 }))
 

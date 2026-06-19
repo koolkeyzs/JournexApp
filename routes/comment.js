@@ -26,6 +26,7 @@ router.post('/' , validateComment, catchAsync (async(req,res)=>{
    entries.comment.push(comment)
 await comment.save()
 await entries.save()
+ req.flash('success' , 'succesfully made a new comment')
 res.redirect (`/entries/${entries._id}`);
 
 }))
@@ -35,6 +36,7 @@ router.delete('/:commentId' , catchAsync(async (req , res)=>{
     const {id , commentId} = req.params
     await Journex.findByIdAndUpdate(id , {$pull:{comment: commentId} })
  await Comment.findByIdAndDelete(commentId)
+  req.flash('success' , 'succesfully deleted this comment')
  res.redirect(`/entries/${id}`)
 }))
 
