@@ -13,6 +13,11 @@ const {entrySchema, commentSchema} = require('./model/JOIschema')
 const Comment = require('./model/comments')
 const entryRoutes = require ('./routes/entry')
 const commentRoutes = require('./routes/comment')
+const userRoutes = require('./routes/user')
+const passport = require('passport')
+const passportLocal = require('passport-local')
+const User = require('./model/user')
+
 
 app.engine('ejs' ,  Ejsmate)
 
@@ -33,10 +38,9 @@ app.set ('view engine', 'ejs');
 app.use(express.urlencoded({extended:true}))
 
 
-app.get('/' , (req , res) =>{
-    res.render('home')
 
-})
+
+
 
 
 const sessionConfig = {
@@ -50,18 +54,41 @@ maxAge: 1000 *60 *60 *24 * 7
     }
 }
 
+
 app.use(session(sessionConfig))
 app.use(flash())
 
 
+
+app.use(passport.initialize())
+app.use(passport.session())
+passport.use(new passportLocal(User.authenticate()))
+
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
+
+
 app.use((req , res , next) =>{
+    // console.log(req.session)
+    res.locals.currentUser = req.user
     res.locals.success = req.flash('success')
     res.locals.error = req.flash('error')
     next()
 })
 
+
+
+
+app.get('/' , (req , res) =>{
+    res.render('home')
+
+})
+
+
 app.use('/entries' , entryRoutes)
 app.use('/entries/:id/comments' , commentRoutes)
+app.use('/' , userRoutes)
 
 
 app.all('/{*path}', (req, res, next) =>{

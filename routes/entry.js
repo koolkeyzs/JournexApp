@@ -4,7 +4,7 @@ const {entrySchema} = require('../model/JOIschema')
 const catchAsync = require ('../utils/CatchAsync')
 const ExpressError = require ('../utils/ExpressErrors')
 const Journex = require ('../model/journex');
-
+const {isLoggedIn} = require('../middleware')
 
 const validateEntry = (req , res , next)=>{
     const {error} = entrySchema.validate(req.body)
@@ -26,12 +26,12 @@ router.get('/' , catchAsync(async (req , res) =>{
     
 }))
 
-router.get('/new' , (req , res) =>{
+router.get('/new' , isLoggedIn ,(req , res) =>{
  res.render ('new')
 })
 
 
-router.post ('/' ,validateEntry, catchAsync (async (req , res , next) =>{
+router.post ('/' , isLoggedIn ,validateEntry, catchAsync (async (req , res , next) =>{
     const entryData = req.body.entry
     entryData.isPublic = entryData.isPublic === 'on' // 👈 convert 'on' to true
     const entries = new Journex(entryData)
@@ -50,7 +50,7 @@ router.get('/:id' , catchAsync( async(req , res) =>{
     res.render('show' , {entries})
 } ))
 
-router.get('/:id/edit' , catchAsync(async (req , res) =>{
+router.get('/:id/edit', isLoggedIn , catchAsync(async (req , res) =>{
      const entries = await Journex.findById(req.params.id)
      if(!entries){
         req.flash('error' , 'Cannot find this campground')
@@ -60,7 +60,7 @@ router.get('/:id/edit' , catchAsync(async (req , res) =>{
 
 }))
 
-router.put ('/:id' , validateEntry, catchAsync(async (req , res) =>{
+router.put ('/:id', isLoggedIn , validateEntry, catchAsync(async (req , res) =>{
     const {id} = req.params
     const entryData = req.body.entry
     entryData.isPublic = entryData.isPublic === 'on' // 👈 convert 'on' to true
@@ -69,7 +69,7 @@ router.put ('/:id' , validateEntry, catchAsync(async (req , res) =>{
      res.redirect (`/entries/${entries._id}`)
 }))
 
-router.delete('/:id' , catchAsync(async (req , res) =>{
+router.delete('/:id', isLoggedIn , catchAsync(async (req , res) =>{
     const {id} = req.params
     const entries = await Journex.findByIdAndDelete(id)
      req.flash('success' , 'succesfully deleted this entry')
