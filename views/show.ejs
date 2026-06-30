@@ -13,21 +13,27 @@
 
 <% } %>
 
-
-  <form action="/entries/<%= entries._id %>?_method=DELETE" method="post" >
+<div>
+<% if(currentUser && entries.author && entries.author._id.equals(currentUser._id)) {%>
+  <form action="/entries/<%= entries._id %>?_method=DELETE" method="post">
     <button>Delete</button>
-</form>
+  </form>
+
+  <p><a href="/entries/<%= entries._id %>/edit">Edit Entry</a></p>
+<% } %>
 
 
-<footer>
-    <p>Posted by:<%= entries.author %></p>
-    <a href="/entries"> All Entries</a>
-   <p> <a href="/entries/<%= entries._id %>/edit"> Edit Entry</a></p>
-  </footer>
-  
-    
+<% if(entries.author) { %>
+  <p>Posted by: <%= entries.author.username %></p>
+<% } %>
+     <a href="/entries"> All Entries</a>
+
+
+
+
 <!-- <h2>Leave a Comment</h2> -->
 
+<% if(currentUser) {%>
   <form action="/entries/<%= entries._id %>/comments" method="post" novalidate class="validated-form">
      <label for="body" class="form-label">Comments</label>
   <textarea name="comment[text]" id="body" cols="30"  rows="" class="form-control " required> </textarea>
@@ -36,14 +42,18 @@
   </div>
   <button>Submit</button>
   </form>
+  <% } %>
  <% for(let comment of entries.comment){%>
 <div class="card mb-3">
  
 <div class=" card-body">
+  <h6>by: <%= comment.author.username %></h6>
     <p>Comment:<%= comment.text %></p>
+    <% if(currentUser && comment.author && comment.author._id.equals(currentUser._id)) {%>
     <form action="/entries/<%= entries._id %>/comments/<%= comment._id %>?_method=DELETE" method="post" >
 <button>Delete</button>
     </form>
+    <% } %>
   </div>
   </div>
   <%} %>

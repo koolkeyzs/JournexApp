@@ -19,8 +19,9 @@ const journexSchema = new Schema ({
 
     author: 
         {
-            type: String,
-            required : true
+           type: Schema.Types.ObjectId,
+        ref: 'User'
+  
         },
 
     verse: {
@@ -47,7 +48,7 @@ const journexSchema = new Schema ({
     type: Schema.Types.ObjectId,
     ref: 'Comment'
 }
-    ]
+    ],
 
 
     // image: {

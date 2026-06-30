@@ -1,3 +1,7 @@
+const ExpressError = require ('./utils/ExpressErrors')
+const {entrySchema , commentSchema} = require('./model/JOIschema')
+const Journex = require ('./model/journex');
+const Comment = require('./model/comments')
 
 
 
@@ -16,3 +20,46 @@ module.exports.isLoggedIn = (req, res, next) => {
     }
     next();
 };
+
+
+module.exports.validateEntry = (req , res , next)=>{
+    const {error} = entrySchema.validate(req.body)
+  if(error){
+    const msg = error.details.map(el => el.message).join(',')
+    throw new ExpressError(msg, 400)
+  }else{
+    next()
+  }
+}
+
+
+module.exports.isAuthor = async (req, res , next)=>{
+   const {id} = req.params
+    const entries = await Journex.findById(id)
+     if(!entries.author.equals(req.user._id)){
+         req.flash('error' , 'You do no have the permission to do that')
+       return res.redirect(`/entries/${id}`)
+     }
+next()
+}
+
+
+module.exports.isCommentAuthor = async (req, res , next)=>{
+   const {id , commentId} = req.params
+    const comment = await Comment.findById(commentId)
+     if(!comment.author.equals(req.user._id)){
+         req.flash('error' , 'You do no have the permission to do that')
+       return res.redirect(`/entries/${id}`)
+     }
+next()
+}
+
+module.exports.validateComment = (req , res , next)=>{
+    const {error} = commentSchema.validate(req.body)
+  if(error){
+    const msg = error.details.map(el => el.message).join(',')
+    throw new ExpressError(msg, 400)
+  }else{
+    next()
+  }
+}

@@ -1,15 +1,10 @@
 <% layout('layout/boilerplate') %>
    
     <h1>Create your Journal entry</h1>
-    <form action="/entries" method="post" novalidate class="validated-form">
+    <form action="/entries" method="post" novalidate class="validated-form" enctype="multipart/form-data">
 <div>
 <label for="name">Title</label>
         <input type="text" placeholder="Title" name="entry[title]" id="title" required class="form-control">
-</div>
-
-<div>
-<label for="author">Author</label>
-        <input type="text" placeholder="author" name="entry[author]" id="author"  required  class="form-control">
 </div>
         
 <div>
@@ -17,8 +12,10 @@
         <input type="text" placeholder="Content" name="entry[content]" id="content"  required  class="form-control">
 </div>
 <div>
-<label for="image">Image url</label>
-        <input type="text" placeholder="image" name="entry[image]" id="image"   required  class="form-control">
+
+        <input type="file" name="image" id="" multiple>
+<!-- <label for="image">Image url</label>
+        <input type="text" placeholder="image" name="entry[image]" id="image"   required  class="form-control"> -->
 </div>
 <div>
 <label for="tags">Tag</label>

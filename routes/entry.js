@@ -4,77 +4,40 @@ const {entrySchema} = require('../model/JOIschema')
 const catchAsync = require ('../utils/CatchAsync')
 const ExpressError = require ('../utils/ExpressErrors')
 const Journex = require ('../model/journex');
-const {isLoggedIn} = require('../middleware')
-
-const validateEntry = (req , res , next)=>{
-    const {error} = entrySchema.validate(req.body)
-  if(error){
-    const msg = error.details.map(el => el.message).join(',')
-    throw new ExpressError(msg, 400)
-  }else{
-    next()
-  }
-}
+const {isLoggedIn , validateEntry, isAuthor} = require('../middleware')
+const entryControl = require('../controllers/entry-controller')
+const multer = require('multer');
+const {storage} = require('../cloudinary/index')
+const upload = multer({ storage });
 
 
 
 
 
-router.get('/' , catchAsync(async (req , res) =>{
-    const entries = await Journex.find({})
-    res.render('entry' , {entries})
-    
-}))
-
-router.get('/new' , isLoggedIn ,(req , res) =>{
- res.render ('new')
+router.route('/')
+.get(catchAsync(entryControl.entryPage))
+// .post(isLoggedIn ,validateEntry, catchAsync (entryControl.createForm))
+.post(upload.array('image'), (req , res)=>{
+    console.log(req.body , req.files)
+    res.send('it worked')
 })
 
+router.get('/new' , isLoggedIn ,entryControl.newFormRender)
 
-router.post ('/' , isLoggedIn ,validateEntry, catchAsync (async (req , res , next) =>{
-    const entryData = req.body.entry
-    entryData.isPublic = entryData.isPublic === 'on' // 👈 convert 'on' to true
-    const entries = new Journex(entryData)
-    await entries.save()
-     req.flash('success' , 'succesfully made a new entry')
-    res.redirect (`/entries/${entries._id}`)
-    
-}))
 
-router.get('/:id' , catchAsync( async(req , res) =>{
-    const entries = await Journex.findById(req.params.id).populate('comment')
-    if(!entries){
-        req.flash('error' , 'Cannot find this campground')
-       return res.redirect('/entries')
-    }
-    res.render('show' , {entries})
-} ))
+router.route('/:id')
+.get(catchAsync(entryControl.showPage))
+.put (isLoggedIn ,  isAuthor, validateEntry, catchAsync(entryControl.editLogicRoute))
+.delete(isLoggedIn , isAuthor, catchAsync(entryControl.deleteRoute))
 
-router.get('/:id/edit', isLoggedIn , catchAsync(async (req , res) =>{
-     const entries = await Journex.findById(req.params.id)
-     if(!entries){
-        req.flash('error' , 'Cannot find this campground')
-       return res.redirect('/entries')
-    }
-    res.render('edit' , {entries})
 
-}))
 
-router.put ('/:id', isLoggedIn , validateEntry, catchAsync(async (req , res) =>{
-    const {id} = req.params
-    const entryData = req.body.entry
-    entryData.isPublic = entryData.isPublic === 'on' // 👈 convert 'on' to true
-    const entries = await Journex.findByIdAndUpdate(id , {...entryData})
-     req.flash('success' , 'succesfully updated this entry')
-     res.redirect (`/entries/${entries._id}`)
-}))
+router.get('/:id/edit', isLoggedIn , isAuthor , catchAsync(entryControl.editPage))
 
-router.delete('/:id', isLoggedIn , catchAsync(async (req , res) =>{
-    const {id} = req.params
-    const entries = await Journex.findByIdAndDelete(id)
-     req.flash('success' , 'succesfully deleted this entry')
-     res.redirect ('/entries');
-}))
+
+
 
 
 module.exports = router;
+
+ 

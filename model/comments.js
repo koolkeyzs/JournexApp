@@ -4,8 +4,16 @@ const Schema = mongoose.Schema
 
 const commentSchema = new Schema({
 
-text: String,
-author: String
+text: {
+    type: String
+},
+
+author: 
+        {
+           type: Schema.Types.ObjectId,
+        ref: 'User'
+  
+        }
 })
 
 

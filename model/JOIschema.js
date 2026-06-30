@@ -4,7 +4,6 @@ const joi = require('joi')
  const entrySchema = joi.object({
     entry : joi.object({
         title : joi.string().required(),
-        author : joi.string().required(),
         content : joi.string().required(),
         image: joi.string().required(),
         tags: joi.string().required(),
@@ -17,7 +16,7 @@ const joi = require('joi')
 const commentSchema = joi.object({
     comment: joi.object({
         text : joi.string().required()
-        // author : joi.string().required()
+
 
     }).required()
   })

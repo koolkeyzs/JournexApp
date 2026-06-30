@@ -5,40 +5,19 @@ const catchAsync = require ('../utils/CatchAsync')
 const ExpressError = require ('../utils/ExpressErrors')
 const Journex = require ('../model/journex');
 const Comment = require('../model/comments')
-
-
-const validateComment = (req , res , next)=>{
-    const {error} = commentSchema.validate(req.body)
-  if(error){
-    const msg = error.details.map(el => el.message).join(',')
-    throw new ExpressError(msg, 400)
-  }else{
-    next()
-  }
-}
+const{validateComment, isLoggedIn , isCommentAuthor} = require('../middleware')
+const commentController = require('../controllers/comment-controller')
 
 
 
 
-router.post('/' , validateComment, catchAsync (async(req,res)=>{
-   const entries = await Journex.findById(req.params.id)
-   const comment = new Comment(req.body.comment)
-   entries.comment.push(comment)
-await comment.save()
-await entries.save()
- req.flash('success' , 'succesfully made a new comment')
-res.redirect (`/entries/${entries._id}`);
 
-}))
+router.post('/' , isLoggedIn, validateComment,  catchAsync (commentController.createComment))
+router.delete('/:commentId' , isLoggedIn , isCommentAuthor,  catchAsync(commentController.deleteComment))
 
 
-router.delete('/:commentId' , catchAsync(async (req , res)=>{
-    const {id , commentId} = req.params
-    await Journex.findByIdAndUpdate(id , {$pull:{comment: commentId} })
- await Comment.findByIdAndDelete(commentId)
-  req.flash('success' , 'succesfully deleted this comment')
- res.redirect(`/entries/${id}`)
-}))
+
+
 
 
 module.exports = router
