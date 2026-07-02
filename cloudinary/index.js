@@ -9,9 +9,13 @@ cloudinary.config({
 })
 
 const storage = new CloudinaryStorage({
-cloudinary,
+
+     cloudinary,
+    params:{
 folder: 'Journex',
-allowedFormats: ['jpeg', 'png' , 'jpg']
+allowedFormats: ['jpeg', 'png' , 'jpg' , 'jjif']
+    }
+
 })
 
 

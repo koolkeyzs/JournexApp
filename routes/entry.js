@@ -15,19 +15,19 @@ const upload = multer({ storage });
 
 
 router.route('/')
-.get(catchAsync(entryControl.entryPage))
-// .post(isLoggedIn ,validateEntry, catchAsync (entryControl.createForm))
-.post(upload.array('image'), (req , res)=>{
-    console.log(req.body , req.files)
-    res.send('it worked')
-})
+// .get(catchAsync(entryControl.entryPage))
+.post(isLoggedIn ,validateEntry, upload.array('image') , catchAsync (entryControl.createForm))
+// .post(upload.array('image'), (req , res)=>{
+//     console.log(req.body , req.files)
+//     res.send('it worked')
+// })
 
 router.get('/new' , isLoggedIn ,entryControl.newFormRender)
 
 
 router.route('/:id')
 .get(catchAsync(entryControl.showPage))
-.put (isLoggedIn ,  isAuthor, validateEntry, catchAsync(entryControl.editLogicRoute))
+.put (isLoggedIn ,  isAuthor,  upload.array('image') , validateEntry, catchAsync(entryControl.editLogicRoute))
 .delete(isLoggedIn , isAuthor, catchAsync(entryControl.deleteRoute))
 
 

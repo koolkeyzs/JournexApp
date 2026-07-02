@@ -17,7 +17,7 @@ module.exports.registerUser = async (req , res , next ) =>{
    req.login(registeredUser , err =>{
     if(err) return next(err)
         req.flash('success' , 'Welcome To JOURNEX')
-   res.redirect('/entries')
+   res.redirect('/dashboard')
    })
    
    }
@@ -37,7 +37,7 @@ module.exports.loginRenderForm = (req , res) =>{
 
 
 module.exports.loginUser = (req , res) =>{
-    const redirectUrl = res.locals?.returnTo || '/entries'  // 👈 use optional chaining
+    const redirectUrl = res.locals?.returnTo || '/dashboard'  // 👈 use optional chaining
     req.flash('success' , 'Welcome Back')
     delete req.session.returnTo
     res.redirect(redirectUrl)
@@ -51,6 +51,6 @@ module.exports.logOutUser = (req, res, next) => {
             return next(err);
         }
         req.flash('success', 'Goodbye!');
-        res.redirect('/entries');
+        res.redirect('/dashboard');
     });
 }

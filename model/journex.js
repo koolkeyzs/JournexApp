@@ -28,10 +28,14 @@ const journexSchema = new Schema ({
         type: String
     },
     
-    image: {
-        type: String
-    },
 
+    images: [
+        {
+        url: String,
+        filename: String
+    }
+    ],
+   
     tags: [
         {
             type: String
@@ -51,20 +55,12 @@ const journexSchema = new Schema ({
     ],
 
 
-    // image: {
-    //     url: String,
-    //     filename: String
-    // },
-
     // createdAt: {
     //     type: Date,
     //     default: Date.now
     // },
 
-    // author: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'User'
-    // }
+
 });
 
 

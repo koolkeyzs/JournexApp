@@ -5,13 +5,12 @@ const joi = require('joi')
     entry : joi.object({
         title : joi.string().required(),
         content : joi.string().required(),
-        image: joi.string().required(),
         tags: joi.string().required(),
         verse: joi.string().required(),
         isPublic: joi.boolean().truthy('on').falsy('off').default(false)
 
     }).required()
-  })
+  }).options({ allowUnknown: true })
 
 const commentSchema = joi.object({
     comment: joi.object({

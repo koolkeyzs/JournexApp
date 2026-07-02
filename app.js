@@ -19,6 +19,7 @@ const {entrySchema, commentSchema} = require('./model/JOIschema')
 const Comment = require('./model/comments')
 const entryRoutes = require ('./routes/entry')
 const commentRoutes = require('./routes/comment')
+const dashboardRoutes = require('./routes/dashboard')
 const userRoutes = require('./routes/user')
 const passport = require('passport')
 const passportLocal = require('passport-local')
@@ -95,6 +96,8 @@ app.get('/' , (req , res) =>{
 app.use('/entries' , entryRoutes)
 app.use('/entries/:id/comments' , commentRoutes)
 app.use('/' , userRoutes)
+app.use('/dashboard' , dashboardRoutes)
+
 
 
 app.all('/{*path}', (req, res, next) =>{

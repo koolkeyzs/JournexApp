@@ -2,7 +2,7 @@
    
 
     <h1>Edit Your entry</h1>
-    <form action="/entries/<%= entries._id %>?_method=PUT " method="post" novalidate class="validated-form">
+    <form action="/entries/<%= entries._id %>?_method=PUT" method="post" novalidate class="validated-form" enctype="multipart/form-data">
 <div>
 <label for="title">  Edit Title</label>
         <input type="text" placeholder="Title" name="entry[title]" id="title" value="<%= entries.title %>"  required  class="form-control"> 
@@ -13,8 +13,8 @@
         <input type="text" placeholder="Content" name="entry[content]" id="content" value="<%= entries.content %>"required  class="form-control">
 </div>
 <div>
-<label for="image">Image url</label>
-        <input type="text" placeholder="image" name="entry[image]" id="image" value="<%= entries.image%>"  required  class="form-control">
+
+              <input type="file" name="image" id="" multiple>
 </div>
 <div>
 <label for="tags">Tag</label>
