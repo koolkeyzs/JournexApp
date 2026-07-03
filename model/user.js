@@ -8,7 +8,20 @@ const userSchema = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+
+    createdAt:{
+        type : Date,
+        default: Date.now
+    
+    },
+
+  
+     profilePic:  {
+        url: String,
+        filename: String
     }
+
 })
 
 userSchema.plugin(passportLocalMongoose.default)

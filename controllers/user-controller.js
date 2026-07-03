@@ -1,7 +1,7 @@
 const Comment = require('../model/comments')
 const Journex = require ('../model/journex');
 const User = require ('../model/user');
-
+const {cloudinary} = require('../cloudinary/index')
 
 
 module.exports.registerRenderForm = (req , res ) =>{
@@ -54,3 +54,26 @@ module.exports.logOutUser = (req, res, next) => {
         res.redirect('/dashboard');
     });
 }
+
+module.exports.profileRoute = async( req , res)=>{
+    const user = await User.findById(req.user._id)
+    res.render('profile' , {user})
+
+}
+
+
+module.exports.uploadProfilePic = async(req, res) => {
+    const user = await User.findById(req.user._id)
+    
+    if(req.file) {
+        user.profilePic = {
+            url: req.file.path,
+            filename: req.file.filename
+        }
+        await user.save()
+    }
+
+    req.flash('success', 'Profile picture updated!')
+    res.redirect('/profile')
+}
+

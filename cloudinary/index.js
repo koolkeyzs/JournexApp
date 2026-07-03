@@ -9,15 +9,17 @@ cloudinary.config({
 })
 
 const storage = new CloudinaryStorage({
-
-     cloudinary,
-    params:{
-folder: 'Journex',
-allowedFormats: ['jpeg', 'png' , 'jpg' , 'jjif']
+    cloudinary,
+    params: {
+        folder: 'Journex',
+        allowedFormats: ['jpeg', 'png', 'jpg'],
+        transformation: [
+            { width: 800, height: 800, crop: 'limit' }, // max dimensions
+            { quality: 'auto' },                         // auto compress
+            { fetch_format: 'auto' }                     // best format
+        ]
     }
-
 })
-
 
 module.exports = {
 cloudinary,

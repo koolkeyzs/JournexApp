@@ -8,31 +8,34 @@ const {isLoggedIn , validateEntry, isAuthor} = require('../middleware')
 const entryControl = require('../controllers/entry-controller')
 const multer = require('multer');
 const {storage} = require('../cloudinary/index')
-const upload = multer({ storage });
 
+const upload = multer({ 
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
+    
+});
 
 
 
 
 router.route('/')
 // .get(catchAsync(entryControl.entryPage))
-.post(isLoggedIn ,validateEntry, upload.array('image') , catchAsync (entryControl.createForm))
-// .post(upload.array('image'), (req , res)=>{
-//     console.log(req.body , req.files)
-//     res.send('it worked')
-// })
+.post(isLoggedIn ,validateEntry, upload.array('image', 4) , catchAsync (entryControl.createForm))
+
 
 router.get('/new' , isLoggedIn ,entryControl.newFormRender)
 
 
 router.route('/:id')
 .get(catchAsync(entryControl.showPage))
-.put (isLoggedIn ,  isAuthor,  upload.array('image') , validateEntry, catchAsync(entryControl.editLogicRoute))
+.put (isLoggedIn ,  isAuthor,  upload.array('image' , 4) , validateEntry, catchAsync(entryControl.editLogicRoute))
 .delete(isLoggedIn , isAuthor, catchAsync(entryControl.deleteRoute))
 
 
 
+
 router.get('/:id/edit', isLoggedIn , isAuthor , catchAsync(entryControl.editPage))
+router.delete('/:id/images/:imageId', isLoggedIn , isAuthor , catchAsync(entryControl.deleteImage))
 
 
 
