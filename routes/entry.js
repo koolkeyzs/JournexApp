@@ -23,7 +23,7 @@ router.route('/')
 .post(isLoggedIn ,validateEntry, upload.array('image', 4) , catchAsync (entryControl.createForm))
 
 
-router.get('/new' , isLoggedIn ,entryControl.newFormRender)
+// router.get('/new' , isLoggedIn ,entryControl.newFormRender)
 
 
 router.route('/:id')

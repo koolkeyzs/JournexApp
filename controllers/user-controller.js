@@ -4,9 +4,9 @@ const User = require ('../model/user');
 const {cloudinary} = require('../cloudinary/index')
 
 
-module.exports.registerRenderForm = (req , res ) =>{
-    res.render('user/register')
-}
+// module.exports.registerRenderForm = (req , res ) =>{
+//     res.render('user/register')
+// }
 
 
 module.exports.registerUser = async (req , res , next ) =>{
@@ -16,31 +16,33 @@ module.exports.registerUser = async (req , res , next ) =>{
    const registeredUser = await User.register(user , password)
    req.login(registeredUser , err =>{
     if(err) return next(err)
-        req.flash('success' , 'Welcome To JOURNEX')
-   res.redirect('/dashboard')
+
+      // after successful registration
+res.json({ message: 'Welcome to Journex!' })
    })
    
    }
    
    catch(e){
         console.log(e)
-    req.flash('error' , e.message)
-    res.redirect('/register')
+res.status(400).json({ message:e.message})
+    
    }
    
 }
 
 
-module.exports.loginRenderForm = (req , res) =>{
-    res.render('user/login')
-}
+
+// module.exports.loginRenderForm = (req , res) =>{
+//     res.render('user/login')
+// }
 
 
 module.exports.loginUser = (req , res) =>{
     const redirectUrl = res.locals?.returnTo || '/dashboard'  // 👈 use optional chaining
     req.flash('success' , 'Welcome Back')
     delete req.session.returnTo
-    res.redirect(redirectUrl)
+    res.json({ message: 'Welcome Back!' })
   
 }
 
@@ -50,14 +52,14 @@ module.exports.logOutUser = (req, res, next) => {
         if (err) {
             return next(err);
         }
-        req.flash('success', 'Goodbye!');
-        res.redirect('/dashboard');
+        res.json({ message: 'Goodbye!' })
+     
     });
 }
 
 module.exports.profileRoute = async( req , res)=>{
     const user = await User.findById(req.user._id)
-    res.render('profile' , {user})
+    res.json({user})
 
 }
 
@@ -73,7 +75,25 @@ module.exports.uploadProfilePic = async(req, res) => {
         await user.save()
     }
 
-    req.flash('success', 'Profile picture updated!')
-    res.redirect('/profile')
+    res.json({message : 'Succesfully updated profile pic '})
 }
 
+module.exports.updateProfile = async (req, res) => {
+    const { bio } = req.body
+   await User.findByIdAndUpdate(req.user._id, { bio })
+    res.json({ message: 'Profile updated!' })
+}
+
+
+module.exports.updateDetails = async (req, res) => {
+    const { username, email } = req.body
+    await User.findByIdAndUpdate(req.user._id, { username, email })
+    res.json({ message: 'Details updated!' })
+}
+
+module.exports.changePassword = async (req, res) => {
+    const { oldPassword, newPassword } = req.body
+    const user = await User.findById(req.user._id)
+    await user.changePassword(oldPassword, newPassword) // passport method!
+    res.json({ message: 'Password changed!' })
+}

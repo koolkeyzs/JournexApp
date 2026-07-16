@@ -12,7 +12,7 @@ module.exports.dashHome = async (req , res) =>{
         isPublic : true
     }).populate('author')
 
-    res.render('dashboard' , {personalEntry , communityEntries})
+    res.json({personalEntry , communityEntries , currentUser: req.user})
 }
 
 
@@ -21,11 +21,11 @@ module.exports.privateEntry = async(req , res) =>{
         author: req.user._id,
         isPublic: false 
     })
-    res.render('privateEntry' , {entries})
+    res.json({entries})
 }
 module.exports.communityFeed = async(req , res) =>{
     const entries = await Journex.find({
           isPublic : true
     }).populate('author')
-    res.render('community' , {entries})
+    res.json({entries})
 }

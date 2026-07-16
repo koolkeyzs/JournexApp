@@ -26,6 +26,13 @@ const passport = require('passport')
 const passportLocal = require('passport-local')
 const User = require('./model/user')
 const helmet = require('helmet')
+const cors = require('cors')
+
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}))
 
 
 app.engine('ejs' ,  Ejsmate)
@@ -38,6 +45,9 @@ db.once ('open'  ,()=>{
     console.log('Database Connected')
 })
 
+app.use(express.json())
+
+
 const methodOverride = require('method-override')
 app.use(methodOverride ('_method'))
 
@@ -46,6 +56,7 @@ app.use(sanitizeV5({ replaceWith: '_' }));
 app.set ('views' , path.join(__dirname, 'views'));
 app.set ('view engine', 'ejs');
 app.use(express.urlencoded({extended:true}))
+
 
 
 
@@ -85,8 +96,8 @@ passport.deserializeUser(User.deserializeUser())
 app.use((req , res , next) =>{
     console.log(req.query)
     res.locals.currentUser = req.user
-    res.locals.success = req.flash('success')
-    res.locals.error = req.flash('error')
+    // res.locals.success = req.flash('success')
+    // res.locals.error = req.flash('error')
     next()
 })
 
@@ -105,18 +116,34 @@ app.use('/' , userRoutes)
 app.use('/dashboard' , dashboardRoutes)
 
 
+app.use((err, req, res, next) => {
+    if(err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'Image too large! Maximum 2MB per image' })
+    }
+    if(err.code === 'LIMIT_UNEXPECTED_FILE') {
+        return res.status(400).json({ message: 'Maximum of 4 images per entry!' })
+    }
+    next(err)
+})
+
+app.use((err, req, res, next) => {
+    if(err.name === 'AuthenticationError') {
+        return res.status(401).json({ message: 'Incorrect username or password!' })
+    }
+    next(err)
+})
+
+
 
 app.all('/{*path}', (req, res, next) =>{
     next (new ExpressError('Page Not Found' , 404))
 })
 
-app.use((err , req , res , next) =>{
-    const {status =500} = err
-    if(!err.message) err.message = 'oops something went wrong'
-    res.status(status).render('error' , {err})
-  
+app.use((err, req, res, next) => {
+    const { status = 500 } = err
+    if(!err.message) err.message = 'Something went wrong!'
+    res.status(status).json({ message: err.message }) 
 })
-
 
 
 

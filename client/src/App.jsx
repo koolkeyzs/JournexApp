@@ -1,0 +1,32 @@
+import { Routes, Route } from 'react-router-dom'
+import Dashboard from './pages/dashboardPage'
+import Login from './pages/LoginPage'
+import PrivateEntries from './pages/PrivateEntries'
+import CommunityFeed from './pages/CommunityEntries'
+import Register from './pages/registerPage'
+import toast from 'react-hot-toast'
+import ShowPage from './pages/Showpage'
+import NewEntry from './pages/NewEntry'
+import EditPage from './pages/Edit'
+import ProfilePage from './pages/UserProfile'
+import HomePage from './pages/HomePage'
+import { AnimatePresence } from 'framer-motion'
+
+export default function App() {
+  return (
+      <AnimatePresence mode="wait">
+    <Routes>
+       <Route path="/" element={<HomePage/>} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path='/login' element={<Login/>}/>
+      <Route path="/dashboard/private" element={<PrivateEntries />} />
+<Route path="/dashboard/community" element={<CommunityFeed />} />
+<Route path="/register" element={<Register />} />
+<Route path="/entries/:id" element={<ShowPage/>} />
+<Route path="/entries" element={<NewEntry/>} />
+<Route path="/entries/:id/edit" element={<EditPage/>} />
+<Route path="/profile" element={<ProfilePage/>} />
+    </Routes>
+    </AnimatePresence>
+  )
+}

@@ -11,17 +11,24 @@ const upload = multer({ storage });
 
 
 router.route('/register')
-.get(userController.registerRenderForm )
+// .get(userController.registerRenderForm )
 .post(catchAsync ( userController.registerUser))
 
 
 router.route('/login')
-.get(userController.loginRenderForm )
-.post(storeReturnTo, passport.authenticate('local', {failureFlash: true , failureRedirect: '/login'}), userController.loginUser  )
+// .get(userController.loginRenderForm )
+.post(storeReturnTo, passport.authenticate('local', {
+    failureMessage: true,
+    failureWithError: true
+}), userController.loginUser)
+
 
 router.get('/logout', userController.logOutUser); 
 router.get('/profile', isLoggedIn, (userController.profileRoute)); 
 router.post('/profile/upload', isLoggedIn, upload.single('profilePic'), (userController.uploadProfilePic)); 
 
+router.put('/profile/update', isLoggedIn, catchAsync(userController.updateProfile))
+router.put('/profile/change-password', isLoggedIn, catchAsync(userController.changePassword))
+router.put('/profile/update-details', isLoggedIn, catchAsync(userController.updateDetails))
 
 module.exports = router;

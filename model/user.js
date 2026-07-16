@@ -20,6 +20,10 @@ const userSchema = new Schema({
      profilePic:  {
         url: String,
         filename: String
+    }, 
+
+    bio: {
+        type: String
     }
 
 })
