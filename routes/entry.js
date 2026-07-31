@@ -17,6 +17,7 @@ const upload = multer({
 
 
 
+router.get('/search' , isLoggedIn, catchAsync(entryControl.searchEntries))
 
 router.route('/')
 // .get(catchAsync(entryControl.entryPage))
@@ -37,8 +38,7 @@ router.route('/:id')
 router.get('/:id/edit', isLoggedIn , isAuthor , catchAsync(entryControl.editPage))
 router.delete('/:id/images/:imageId', isLoggedIn , isAuthor , catchAsync(entryControl.deleteImage))
 
-
-
+router.post('/:id/like', isLoggedIn, catchAsync(entryControl.toggleLike))
 
 
 module.exports = router;

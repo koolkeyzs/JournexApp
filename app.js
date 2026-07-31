@@ -29,10 +29,27 @@ const helmet = require('helmet')
 const cors = require('cors')
 
 
+
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  " http://192.168.69.238:5173/", // update if your IP changes
+];
+
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
-}))
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman) or from allowed list
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+      origin: true, // allows ALL origins
+    
+}));
+
 
 
 app.engine('ejs' ,  Ejsmate)
@@ -66,14 +83,14 @@ app.use(express.urlencoded({extended:true}))
 
 const sessionConfig = {
     name: 'session',
-    secret : 'I have a Secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized : true,
-    cookie:{
-        httpOnly : true,
-        // secure: true,
-expires : Date.now() + 1000 *60 *60 *24 * 7,
-maxAge: 1000 *60 *60 *24 * 7
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        secure: false,       // explicit false since you're on http:// locally
+        sameSite: 'lax',     // explicit, don't rely on browser default
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days — recalculated correctly per session
     }
 }
 
@@ -147,6 +164,6 @@ app.use((err, req, res, next) => {
 
 
 
-app.listen(3000  ,()=>{
+app.listen(3000  , '0.0.0.0',()=>{
  console.log('APP IS LISTENING AT PORT 3000')
 })

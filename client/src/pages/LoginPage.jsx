@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import PageTransition from '../Components/PageTransition'
 import toast from 'react-hot-toast'
 import api from '../api'
+import { useSearchParams } from 'react-router-dom'
 import { BookOpen, LogIn } from 'lucide-react'
 
 export default function Login() {
@@ -11,22 +12,41 @@ export default function Login() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        setLoading(true)
-        try {
-            await api.post('/login', { username, password })
-            toast.success('Welcome back! 🙏')
-            setTimeout(() => {
-                navigate('/dashboard')
-            }, 1500)
-        } catch (err) {
-            toast.error('Incorrect username or password')
-        } finally {
-            setLoading(false)
-        }
-    }
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault()
+    //     setLoading(true)
+    //     try {
+    //         await api.post('/login', { username, password })
+    //         toast.success('Welcome back! 🙏')
+    //         setTimeout(() => {
+    //             navigate('/dashboard')
+    //         }, 1500)
+    //     } catch (err) {
+    //         toast.error('Incorrect username or password')
+    //     } finally {
+    //         setLoading(false)
+    //     }
+    // }
 
+
+const [searchParams] = useSearchParams()
+const redirectTo = searchParams.get('redirect') || '/dashboard'
+
+const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+        await api.post('/login', { username, password })
+        toast.success('Welcome back! 🙏')
+        setTimeout(() => {
+            navigate(redirectTo) // redirects back to where they were!
+        }, 1500)
+    } catch (err) {
+        toast.error('Incorrect username or password')
+    } finally {
+        setLoading(false)
+    }
+}
     return (
         <PageTransition>
             <div className="min-h-screen bg-base-200 flex items-center justify-center px-4">

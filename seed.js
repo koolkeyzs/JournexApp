@@ -62,5 +62,77 @@
 // });
 
 
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config()
+}
 
+const mongoose = require('mongoose')
+const Journex = require('./model/journex')
+const User = require('./model/user')
+
+mongoose.connect('mongodb://localhost:27017/Journex')
+
+const db = mongoose.connection
+db.on('error', console.error.bind(console, 'Connection Error'))
+db.once('open', () => {
+    console.log('Database Connected')
+})
+
+const sampleImages = [
+    'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=800',
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
+    'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800',
+    'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=800',
+    'https://images.unsplash.com/photo-1519750157634-b6d493a0f77c?w=800',
+    null, // some entries with no image, to test your fallback icon
+]
+
+const sampleEntries = [
+    { title: "Finding Peace in His Presence", content: "Today I was reminded that in the midst of every storm, God is still in control. I sat quietly this morning and felt a peace that truly does surpass understanding.", verse: "Philippians 4:7", tags: ["peace", "faith"] },
+    { title: "Lessons from the Wilderness", content: "The wilderness is not a place of punishment, but a place of preparation. I've been walking through a hard season, but I can see now how it's shaping me.", verse: "Deuteronomy 8:2", tags: ["growth", "trust"] },
+    { title: "Grateful Heart", content: "I choose to be grateful for the small things that often go unnoticed — a warm cup of coffee, a quiet morning, a friend who checked in on me today.", verse: "1 Thessalonians 5:18", tags: ["gratitude"] },
+    { title: "Trusting God's Timing", content: "It's hard to wait. But today I was reminded that His timing is perfect, even when mine feels off. I'm learning to release control.", verse: "Ecclesiastes 3:1", tags: ["patience", "trust"] },
+    { title: "Walking by Faith", content: "Some days the path ahead is completely unclear, and that used to terrify me. Today, I'm choosing to walk by faith and not by sight.", verse: "2 Corinthians 5:7", tags: ["faith"] },
+    { title: "He Restores My Soul", content: "I felt so weary this week, running on empty. But sitting in stillness this morning, I felt Him restore something in me I didn't know was broken.", verse: "Psalm 23:3", tags: ["restoration", "peace"] },
+    { title: "A Season of Waiting", content: "Nothing about my circumstances has changed, but something in my heart has shifted. I'm learning that waiting isn't wasted time.", verse: "Isaiah 40:31", tags: ["patience"] },
+    { title: "Joy in the Morning", content: "Weeping may endure for a night, but joy comes in the morning. I woke up today with an unexplainable lightness after a hard week.", verse: "Psalm 30:5", tags: ["joy"] },
+    { title: "Surrendering My Plans", content: "I had everything mapped out, and none of it happened the way I expected. Learning to hold my plans loosely and trust the bigger picture.", verse: "Proverbs 16:9", tags: ["surrender", "trust"] },
+    { title: "Community and Connection", content: "I'm so thankful for the people God has placed in my life this season. Community has carried me through more than I realized.", verse: "Ecclesiastes 4:9-10", tags: ["community", "gratitude"] },
+]
+
+async function seedDB() {
+    const users = await User.find({})
+
+    if (users.length === 0) {
+        console.log("No users found! Register at least one user first, then run this again.")
+        return
+    }
+
+    await Journex.deleteMany({}) // clears existing entries — comment this out if you want to keep old data
+
+    for (let i = 0; i < sampleEntries.length; i++) {
+        const entry = sampleEntries[i]
+        const randomUser = users[Math.floor(Math.random() * users.length)]
+        const randomImage = sampleImages[Math.floor(Math.random() * sampleImages.length)]
+
+        const newEntry = new Journex({
+            title: entry.title,
+            content: entry.content,
+            verse: entry.verse,
+            tags: entry.tags,
+            author: randomUser._id,
+            isPublic: true,
+            images: randomImage ? [{ url: randomImage, filename: `seed-${i}` }] : [],
+            createdAt: new Date(Date.now() - Math.floor(Math.random() * 10) * 24 * 60 * 60 * 1000) // spread over the last 10 days
+        })
+
+        await newEntry.save()
+    }
+
+    console.log(`Seeded ${sampleEntries.length} public entries!`)
+}
+
+seedDB().then(() => {
+    mongoose.connection.close()
+})
  

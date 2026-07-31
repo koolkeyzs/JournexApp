@@ -85,7 +85,7 @@ const [currentUser, setCurrentUser] = useState(null)
 
             {/* Footer */}
             <footer className="border-t border-base-content/10 px-8 py-6 text-center text-base-content/50 text-sm">
-                <p>© 2025 Journex. Built for the body of Christ. 🙏</p>
+                <p>© 2026 Journex. Built for the body of Christ. 🙏</p>
             </footer>
 
         </div>

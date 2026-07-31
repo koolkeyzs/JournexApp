@@ -60,6 +60,38 @@ const journexSchema = new Schema ({
         default: Date.now
     },
 
+mood: {
+    type: String,
+   enum: [
+    'Joyful', 
+    'Grateful', 
+    'Peaceful', 
+    'Hopeful',
+    'Blessed',
+    'Excited',
+    'Content',
+    'Reflective',
+    'Sad',
+    'Anxious',
+    'Overwhelmed',
+    'Angry',
+    'Confused',
+    'Tired',
+    'Lonely',
+    'Hurt',
+    'Disappointed',
+    'Fearful',
+    'Doubtful',
+    'Broken'
+],
+    default: 'Peaceful'
+},
+
+likes: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+}]
+
 
 });
 

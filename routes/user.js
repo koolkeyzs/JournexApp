@@ -30,5 +30,5 @@ router.post('/profile/upload', isLoggedIn, upload.single('profilePic'), (userCon
 router.put('/profile/update', isLoggedIn, catchAsync(userController.updateProfile))
 router.put('/profile/change-password', isLoggedIn, catchAsync(userController.changePassword))
 router.put('/profile/update-details', isLoggedIn, catchAsync(userController.updateDetails))
-
+router.get('/users/:id', isLoggedIn, catchAsync(userController.publicProfile))
 module.exports = router;

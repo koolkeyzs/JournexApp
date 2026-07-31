@@ -37,8 +37,9 @@ module.exports.isAuthor = async (req, res , next)=>{
    const {id} = req.params
     const entries = await Journex.findById(id)
      if(!entries.author.equals(req.user._id)){
-         req.flash('error' , 'You do no have the permission to do that')
-       return res.redirect(`/entries/${id}`)
+      return res.status(403).json({message: 'You do no have the permission to do that'} )
+     
+     
      }
 next()
 }
@@ -48,8 +49,8 @@ module.exports.isCommentAuthor = async (req, res , next)=>{
    const {id , commentId} = req.params
     const comment = await Comment.findById(commentId)
      if(!comment.author.equals(req.user._id)){
-         req.flash('error' , 'You do no have the permission to do that')
-       return res.redirect(`/entries/${id}`)
+           return res.status(403).json({message: 'You do no have the permission to do that'} )
+     
      }
 next()
 }
@@ -63,3 +64,5 @@ module.exports.validateComment = (req , res , next)=>{
     next()
   }
 }
+
+

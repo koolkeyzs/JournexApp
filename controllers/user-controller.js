@@ -64,6 +64,28 @@ module.exports.profileRoute = async( req , res)=>{
 }
 
 
+
+module.exports.publicProfile = async (req, res) => {
+    const { id } = req.params
+
+    const user = await User.findById(id).select('username bio profilePic createdAt')
+
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' })
+    }
+
+    const publicEntries = await Journex.find({
+        author: id,
+        isPublic: true
+    
+
+    }).sort({ createdAt: -1 })
+
+   res.json({ user, publicEntries, currentUser: req.user })  
+}
+
+
+
 module.exports.uploadProfilePic = async(req, res) => {
     const user = await User.findById(req.user._id)
     
@@ -86,11 +108,24 @@ module.exports.updateProfile = async (req, res) => {
 
 
 module.exports.updateDetails = async (req, res) => {
-    const { username, email } = req.body
-    await User.findByIdAndUpdate(req.user._id, { username, email })
-    res.json({ message: 'Details updated!' })
+    console.log('body:', req.body) // check what's coming in
+    console.log('user:', req.user) // check if user exists
+    try {
+        const { username, email } = req.body
+        const user = await User.findByIdAndUpdate(req.user._id, { username, email }, { new: true })
+        console.log('updated user:', user) // check if update worked
+        
+        req.login(user, (err) => {
+            if(err) {
+                return res.status(500).json({ message: 'Error updating session' })
+            }
+            res.json({ message: 'Details updated!' })
+        })
+    } catch(e) {
+        console.log('error:', e)
+        res.status(500).json({ message: e.message })
+    }
 }
-
 module.exports.changePassword = async (req, res) => {
     const { oldPassword, newPassword } = req.body
     const user = await User.findById(req.user._id)

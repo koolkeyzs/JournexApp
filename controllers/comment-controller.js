@@ -17,3 +17,12 @@ module.exports.deleteComment = async (req, res) => {
     await Comment.findByIdAndDelete(commentId)
     res.json({ message: 'Comment deleted successfully!' })
 }
+
+
+
+module.exports.editComment = async (req, res) => {
+    const { commentId } = req.params
+    const { comment } = req.body
+    await Comment.findByIdAndUpdate(commentId, { text: comment.text })
+    res.json({ message: 'Comment updated!' })
+}

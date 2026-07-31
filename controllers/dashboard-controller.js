@@ -21,11 +21,15 @@ module.exports.privateEntry = async(req , res) =>{
         author: req.user._id,
         isPublic: false 
     })
-    res.json({entries})
+    res.json({entries , currentUser: req.user})
 }
 module.exports.communityFeed = async(req , res) =>{
     const entries = await Journex.find({
           isPublic : true
     }).populate('author')
-    res.json({entries})
+    res.json({entries, currentUser: req.user})
 }
+
+
+
+
