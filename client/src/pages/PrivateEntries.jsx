@@ -40,27 +40,40 @@ export default function PrivateEntries() {
 
     return (
         <PageTransition>
-            <div className="flex">
+            <div className="flex bg-base-200 min-h-screen">
                 <SideBar currentUser={currentUser} />
 
                 <div className="flex-1 md:ml-64">
                     <TopBar currentUser={currentUser} />
 
                     <div className="p-6">
-                        <h1 className="text-2xl font-bold text-gray-800 mb-6">My Journal</h1>
+                        <h1 className="text-2xl font-bold text-base-content mb-6">
+                            My Journal
+                        </h1>
 
                         {loading ? (
-                            <p className="text-gray-500">Loading your reflections...</p>
+                            <p className="text-base-content/60">
+                                Loading your reflections...
+                            </p>
                         ) : sortedEntries.length > 0 ? (
                             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                                 {sortedEntries.map(entry => (
-                                    <GridEntryCard key={entry._id} entry={entry} />
+                                    <GridEntryCard
+                                        key={entry._id}
+                                        entry={entry}
+                                    />
                                 ))}
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-20 text-center">
-                                <BookOpen className="text-purple-200 mb-3" size={48} />
-                                <p className="text-gray-500">No entries yet — start your first reflection.</p>
+                                <BookOpen
+                                    className="text-primary/30 mb-3"
+                                    size={48}
+                                />
+
+                                <p className="text-base-content/60">
+                                    No entries yet — start your first reflection.
+                                </p>
                             </div>
                         )}
                     </div>

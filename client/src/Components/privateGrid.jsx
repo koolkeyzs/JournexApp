@@ -11,49 +11,59 @@ const GridEntryCard = ({ entry }) => {
     year: "numeric",
   });
 
-  // strip HTML tags for the snippet
-const stripHtml = (html) => html.replace(/<[^>]*>/g, '')
-const plainContent = stripHtml(content)
-const snippet = plainContent.length > 100 ? plainContent.slice(0, 100) + "..." : plainContent
-  
+  const stripHtml = (html) => html.replace(/<[^>]*>/g, "");
+  const plainContent = stripHtml(content);
+  const snippet =
+    plainContent.length > 100
+      ? plainContent.slice(0, 100) + "..."
+      : plainContent;
 
-  
   return (
     <Link
       to={`/entries/${_id}`}
-      className="flex flex-col bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
+      className="flex flex-col bg-base-100 rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
     >
-      {/* Image on top, full width */}
+      {/* Image */}
       {thumbnail ? (
-        <img src={thumbnail} alt={title} className="w-full h-40 object-cover bg-gray-100" />
+        <img
+          src={thumbnail}
+          alt={title}
+          className="w-full h-40 object-cover bg-base-200"
+        />
       ) : (
-        <div className="w-full h-40 bg-purple-50 flex items-center justify-center">
-          <BookOpen className="text-purple-300" size={32} />
+        <div className="w-full h-40 bg-primary/10 flex items-center justify-center">
+          <BookOpen className="text-primary" size={32} />
         </div>
       )}
 
       <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="font-semibold text-gray-800 truncate">{title}</h3>
+          <h3 className="font-semibold text-base-content truncate">
+            {title}
+          </h3>
+
           <button
-            className="text-gray-400 hover:text-gray-600 shrink-0"
+            className="text-base-content/50 hover:text-base-content shrink-0"
             onClick={(e) => e.preventDefault()}
           >
             <MoreVertical size={16} />
           </button>
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+        <div className="flex items-center gap-1 text-xs text-base-content/60 mb-2">
           <Calendar size={12} />
           <span>{formattedDate}</span>
+
           {!isPublic && (
-            <span className="ml-auto text-xs font-medium bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
+            <span className="ml-auto text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
               Private
             </span>
           )}
         </div>
 
-        <p className="text-sm text-gray-600 line-clamp-3">{snippet}</p>
+        <p className="text-sm text-base-content/80 line-clamp-3">
+          {snippet}
+        </p>
       </div>
     </Link>
   );

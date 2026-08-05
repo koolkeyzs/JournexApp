@@ -38,19 +38,19 @@ export default function CommunityFeed() {
 
   return (
     <PageTransition>
-      <div className="flex">
+      <div className="flex bg-base-200 min-h-screen">
         <SideBar currentUser={currentUser} />
 
         <div className="flex-1 md:ml-64">
           <TopBar currentUser={currentUser} />
 
           <div className="p-6 max-w-3xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">
+            <h1 className="text-2xl font-bold text-base-content text-center mb-6">
               Community Feed
             </h1>
 
             {loading ? (
-              <p className="text-gray-500">Loading community reflections...</p>
+              <p className="text-base-content/60">Loading community reflections...</p>
             ) : entries.length > 0 ? (
               <>
                 <FeaturedSlideshow entries={entries} />
@@ -64,17 +64,12 @@ export default function CommunityFeed() {
                       <CommunityPostCard key={entry._id} entry={entry} currentUser={currentUser} />
                     ))}
                 </div>
-
-                  {/* Sidebar - 1/3 width on desktop, hidden on mobile (or shown below feed) */}
-    
               </>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <Users className="text-purple-200 mb-3" size={48} />
-                <p className="text-gray-500">No community reflections yet.</p>
+                <Users className="text-primary/30 mb-3" size={48} />
+                <p className="text-base-content/60">No community reflections yet.</p>
               </div>
-
-              
             )}
           </div>
         </div>
