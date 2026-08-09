@@ -16,7 +16,7 @@ router.post('/' , isLoggedIn, validateComment,  catchAsync (commentController.cr
 router.delete('/:commentId' , isLoggedIn , isCommentAuthor,  catchAsync(commentController.deleteComment))
 
 
-router.put('/:commentId' , isLoggedIn , validateComment, catchAsync(commentController.editComment))
+router.put('/:commentId' , isLoggedIn , isCommentAuthor, validateComment, catchAsync(commentController.editComment))
 
 
 

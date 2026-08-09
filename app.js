@@ -22,25 +22,33 @@ const {entrySchema, commentSchema} = require('./model/JOIschema')
 const Comment = require('./model/comments')
 const entryRoutes = require ('./routes/entry')
 const commentRoutes = require('./routes/comment')
+const  reportRoutes = require('./routes/report')
 const dashboardRoutes = require('./routes/dashboard')
 const userRoutes = require('./routes/user')
+const adminRoutes = require('./routes/admin')
+const announcementRoutes = require('./routes/announcement')
+const notificationRoutes = require('./routes/notification')
 const passport = require('passport')
 const passportLocal = require('passport-local')
 const User = require('./model/user')
 const helmet = require('helmet')
 const cors = require('cors')
-const dbUrl = process.env.DB_ACCESS
+const dbUrl = 'mongodb://localhost:27017/Journex'
+
 
 const { MongoStore } = require('connect-mongo')
 
+
+
+
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://192.168.122.238:5173", // update if your IP changes
-  process.env.CLIENT_URL, // your real deployed frontend URL, set in Render's env vars
+  " http://192.168.122.238:5173/", // update if your IP changes
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
+    // allow requests with no origin (like Postman) or from allowed list
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -48,7 +56,10 @@ app.use(cors({
     }
   },
   credentials: true,
+      origin: true, // allows ALL origins
+    
 }));
+
 
 
 app.engine('ejs' ,  Ejsmate)
@@ -74,6 +85,10 @@ app.set ('view engine', 'ejs');
 app.use(express.urlencoded({extended:true}))
 
 
+
+
+
+
 const store = new MongoStore({
     mongoUrl: dbUrl,
     touchAfter: 24 * 60 * 60,
@@ -82,7 +97,7 @@ const store = new MongoStore({
     }
 })
 store.on('error' ,function (e){
-    console.log ('session store error', e)
+    console.log ('session store error')
 })
 
 const sessionConfig = {
@@ -93,9 +108,9 @@ const sessionConfig = {
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 1000 * 60 * 60 * 24 * 7,
+        secure: false,       // explicit false since you're on http:// locally
+        sameSite: 'lax',     // explicit, don't rely on browser default
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days — recalculated correctly per session
     }
 }
 
@@ -116,7 +131,10 @@ passport.deserializeUser(User.deserializeUser())
 
 
 app.use((req , res , next) =>{
+    console.log(req.query)
     res.locals.currentUser = req.user
+    // res.locals.success = req.flash('success')
+    // res.locals.error = req.flash('error')
     next()
 })
 
@@ -125,6 +143,7 @@ app.use((req , res , next) =>{
 
 app.get('/' , (req , res) =>{
     res.render('home')
+
 })
 
 
@@ -132,6 +151,10 @@ app.use('/entries' , entryRoutes)
 app.use('/entries/:id/comments' , commentRoutes)
 app.use('/' , userRoutes)
 app.use('/dashboard' , dashboardRoutes)
+app.use('/admin' , adminRoutes)
+app.use('/announcements', announcementRoutes)
+app.use('/notifications', notificationRoutes)
+app.use('/' , reportRoutes)
 
 
 app.use((err, req, res, next) => {
@@ -164,7 +187,7 @@ app.use((err, req, res, next) => {
 })
 
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, '0.0.0.0', ()=>{
- console.log(`APP IS LISTENING AT PORT ${PORT}`)
+
+app.listen(3000  , '0.0.0.0',()=>{
+ console.log('APP IS LISTENING AT PORT 3000')
 })

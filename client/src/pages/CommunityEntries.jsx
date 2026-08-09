@@ -9,6 +9,8 @@ import FeaturedSlideshow from "../Components/community/FeaturedSlideShow";
 import CommunityPostCard from "../Components/community/CommunityPostCard";
 import { Users } from "lucide-react";
 import DailyRandVerse from "../Components/Dashboard/DailyRandVerse";
+import LoadingScreen from "../Components/LoadingScreen";
+import AnnouncementBanner from "../Components/admin/AnnouncementBanner";
 
 export default function CommunityFeed() {
   const [entries, setEntries] = useState([]);
@@ -44,13 +46,15 @@ export default function CommunityFeed() {
         <div className="flex-1 md:ml-64">
           <TopBar currentUser={currentUser} />
 
+          <AnnouncementBanner/>
+
           <div className="p-6 max-w-3xl mx-auto">
             <h1 className="text-2xl font-bold text-base-content text-center mb-6">
               Community Feed
             </h1>
 
             {loading ? (
-              <p className="text-base-content/60">Loading community reflections...</p>
+            <LoadingScreen/>
             ) : entries.length > 0 ? (
               <>
                 <FeaturedSlideshow entries={entries} />

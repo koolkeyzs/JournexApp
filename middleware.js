@@ -33,26 +33,52 @@ module.exports.validateEntry = (req , res , next)=>{
 }
 
 
-module.exports.isAuthor = async (req, res , next)=>{
-   const {id} = req.params
-    const entries = await Journex.findById(id)
-     if(!entries.author.equals(req.user._id)){
-      return res.status(403).json({message: 'You do no have the permission to do that'} )
-     
-     
-     }
-next()
-}
+module.exports.isAuthor = async (req, res, next) => {
+    const { id } = req.params;
+
+    const entry = await Journex.findById(id);
+
+    if (!entry) {
+        return res.status(404).json({
+            message: "Entry not found."
+        });
+    }
+
+    // Admin can do anything
+    if (req.user.role === "admin") {
+        return next();
+    }
+
+    // Owner can also do it
+    if (entry.author.equals(req.user._id)) {
+        return next();
+    }
+
+    return res.status(403).json({
+        message: "You don't have permission."
+    });
+};
 
 
-module.exports.isCommentAuthor = async (req, res , next)=>{
-   const {id , commentId} = req.params
+module.exports.isCommentAuthor = async (req, res, next) => {
+    const { id, commentId } = req.params
     const comment = await Comment.findById(commentId)
-     if(!comment.author.equals(req.user._id)){
-           return res.status(403).json({message: 'You do no have the permission to do that'} )
-     
-     }
-next()
+
+    if (!comment) {
+        return res.status(404).json({ message: 'Comment not found.' })
+    }
+
+    // Admin can do anything
+    if (req.user.role === 'admin') {
+        return next()
+    }
+
+    // Owner can also do it
+    if (comment.author.equals(req.user._id)) {
+        return next()
+    }
+
+    return res.status(403).json({ message: 'You do not have permission to do that' })
 }
 
 module.exports.validateComment = (req , res , next)=>{
@@ -63,6 +89,23 @@ module.exports.validateComment = (req , res , next)=>{
   }else{
     next()
   }
+}
+
+
+module.exports.isAdmin = (req , res , next)=>{
+  if(!req.user){
+    return res.status(401).json({
+      message: 'You must be logged in'
+    })
+  }
+
+  if(req.user.role !== 'admin'){
+    return res.status(403).json({
+      message: 'Access denied'
+    })
+  }
+
+  next()
 }
 
 

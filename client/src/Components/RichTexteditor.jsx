@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import { useEffect, useState } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import {
@@ -13,19 +14,41 @@ import {
 } from "lucide-react";
 
 const RichTextEditor = ({ content, onChange }) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [showPlaceholder, setShowPlaceholder] = useState(
+    !content || !String(content).replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim()
+  );
+
   const editor = useEditor({
     extensions: [StarterKit, Underline],
     content: content || "",
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
     editorProps: {
       attributes: {
         class:
           "prose prose-sm max-w-none min-h-[200px] focus:outline-none px-4 py-3 text-base-content",
       },
+      handleDOMEvents: {
+        focus: () => {
+          if (!editor?.getText().trim()) {
+            editor.commands.clearContent();
+          }
+          return false;
+        },
+      },
+    },
+    onUpdate: ({ editor }) => {
+      const isEmpty = editor.getText().trim().length === 0;
+      setShowPlaceholder(isEmpty && !isFocused);
+      onChange(editor.getHTML());
     },
   });
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const isEmpty = editor.getText().trim().length === 0;
+    setShowPlaceholder(isEmpty && !isFocused);
+  }, [content, editor, isFocused]);
 
   if (!editor) return null;
 
@@ -108,7 +131,24 @@ const RichTextEditor = ({ content, onChange }) => {
       </div>
 
       {/* Editor */}
-      <EditorContent editor={editor} />
+      <div
+        className="relative"
+        onFocus={() => {
+          setIsFocused(true);
+          setShowPlaceholder(false);
+        }}
+        onBlur={() => {
+          setIsFocused(false);
+          setShowPlaceholder(editor.getText().trim().length === 0);
+        }}
+      >
+        <EditorContent editor={editor} />
+        {showPlaceholder && (
+          <div className="pointer-events-none absolute inset-0 flex items-start px-4 py-3 text-base-content/40 text-sm">
+            Write your thought and experience here....
+          </div>
+        )}
+      </div>
 
       {/* Word count */}
       <div className="text-right text-xs text-base-content/60 px-4 pb-2">

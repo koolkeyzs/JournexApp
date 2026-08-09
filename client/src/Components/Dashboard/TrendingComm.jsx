@@ -115,10 +115,7 @@ const TrendingCard = ({ entry, currentUser }) => {
             {entry.comment?.length || 0}
           </span>
 
-          <Bookmark
-            size={13}
-            className="ml-auto text-base-content/40"
-          />
+          
         </div>
       </div>
     </Link>

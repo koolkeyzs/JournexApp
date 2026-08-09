@@ -10,6 +10,10 @@ import {
   Menu,
   X,
   MessageCircle,
+  Flag,
+  ShieldCheck,
+  LockIcon,
+  UnlockIcon
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,37 +31,53 @@ const SideBar = ({ currentUser }) => {
   };
 
   const navLinks = [
-    {
-      to: "/dashboard",
-      icon: <LayoutDashboard size={18} />,
-      label: "Dashboard",
-    },
-    {
-      to: "/dashboard/private",
-      icon: <BookMarked size={18} />,
-      label: "My Journal",
-    },
-    {
-      to: "/dashboard/community",
-      icon: <Users size={18} />,
-      label: "Community Feed",
-    },
-    {
-      to: "/entries",
-      icon: <PenSquare size={18} />,
-      label: "Create New Entry",
-    },
-    {
-      to: "/profile",
-      icon: <User size={18} />,
-      label: "Profile",
-    },
-    {
-      to: "/roadmap",
-      icon: <BookOpenCheck size={18} />,
-      label: "What's Next??",
-    },
-  ];
+  {
+    to: "/dashboard",
+    icon: <LayoutDashboard size={18} />,
+    label: "Dashboard",
+  },
+  {
+    to: "/dashboard/private",
+    icon: <UnlockIcon size={18} />,
+    label: "Private Journal",
+  },
+  {
+    to: "/dashboard/community",
+    icon: <Users size={18} />,
+    label: "Community Feed",
+  },
+  {
+    to: "/entries",
+    icon: <PenSquare size={18} />,
+    label: "Create New Entry",
+  },
+  {
+    to: "/profile",
+    icon: <User size={18} />,
+    label: "Profile",
+  },
+
+  {
+  to: "/my-reports",
+  icon: <Flag size={18} />,
+  label: "My Reports",
+},
+  {
+    to: "/roadmap",
+    icon: <BookOpenCheck size={18} />,
+    label: "What's Next??",
+  },
+
+  ...(currentUser?.role === "admin"
+    ? [
+        {
+          to: "/admin/dashboard",
+          icon: <ShieldCheck size={18} />,
+          label: "Admin Dashboard",
+        },
+      ]
+    : []),
+];
 
   return (
     <>
@@ -88,15 +108,11 @@ const SideBar = ({ currentUser }) => {
       >
         {/* Logo */}
         <div className="p-5 border-b border-base-300">
-          <h2 className="text-2xl flex gap-2 items-center font-bold text-primary">
-            <BookOpen size={28} />
-            Journex
-          </h2>
-
-          <p className="text-xs text-base-content/60 mt-1">
-            Reflect. Grow. Inspire.
-          </p>
-        </div>
+  <img src="/JournexLogo.png" alt="Journex logo" className="h-15 object-contain" />
+  <p className="text-xs text-base-content/60 mt-1">
+    Reflect. Grow. Inspire.
+  </p>
+</div>
 
         {/* Nav Links */}
         <nav className="flex-1 p-4 flex flex-col gap-1">
@@ -116,7 +132,7 @@ const SideBar = ({ currentUser }) => {
         {/* WhatsApp Community */}
         <div className="px-4 pb-3">
           
-           <a href="https://chat.whatsapp.com/YOUR_INVITE_LINK_HERE"
+           <a href="https://chat.whatsapp.com/KX88qWNnwAB12Ei94du7Qu?s=cl&p=a&ilr=0"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-600 transition-all duration-200"

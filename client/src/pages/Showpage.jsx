@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../api";
 import PageTransition from "../Components/PageTransition";
+import TopBar from "../Components/Dashboard/navbar";
 import {
   ArrowLeft,
   BookOpen,
@@ -12,8 +13,10 @@ import {
   SquarePen,
   Heart,
   X,
+  Flag,
 } from "lucide-react";
 import SideBar from "../Components/Dashboard/sidebar";
+import LoadingScreen from "../Components/LoadingScreen";
 
 const moodEmojis = {
   Joyful: "😊",
@@ -45,10 +48,13 @@ export default function ShowPage() {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editText, setEditText] = useState("");
   const [deletingImage, setDeletingImage] = useState(null);
+  const [deletingEntry, setDeletingEntry] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reason, setReason] = useState("");
+  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -86,12 +92,17 @@ export default function ShowPage() {
   };
 
   const handleDelete = async () => {
+    if (deletingEntry) return;
+
     try {
+      setDeletingEntry(true);
       await api.delete(`/entries/${id}`);
       toast.success("Entry deleted!");
       navigate("/dashboard");
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || "Failed to delete entry");
+    } finally {
+      setDeletingEntry(false);
     }
   };
 
@@ -135,13 +146,44 @@ export default function ShowPage() {
     }
   };
 
+  const handleReport = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!currentUser) {
+      toast.error("You must be logged in!");
+      navigate("/login");
+      return;
+    }
+
+    if (!reason.trim()) {
+      toast.error("Please provide a reason.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const { data } = await api.post(`/entries/${entry._id}/report`, {
+        reason,
+      });
+
+      toast.success(data.message);
+
+      setShowReportModal(false);
+      setReason("");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit report.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteImage = async (filename) => {
     try {
       setDeletingImage(filename);
 
-      await api.delete(
-        `/entries/${id}/images/${encodeURIComponent(filename)}`
-      );
+      await api.delete(`/entries/${id}/images/${encodeURIComponent(filename)}`);
 
       toast.success("Image deleted!");
 
@@ -159,32 +201,31 @@ export default function ShowPage() {
   if (!entry)
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-base-content/60">Loading...</p>
+        <LoadingScreen />
       </div>
     );
 
-  const formattedDate = new Date(entry.createdAt).toLocaleDateString(
-    "en-US",
-    {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    }
-  );
+  const formattedDate = new Date(entry.createdAt).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   const readTime = Math.max(
     1,
-    Math.ceil(entry.content.split(" ").length / 200)
+    Math.ceil(entry.content.split(" ").length / 200),
   );
 
   const isOwner =
     currentUser &&
     entry.author &&
     entry.author._id?.toString() === currentUser._id?.toString();
+  const isAdmin = currentUser?.role === "admin";
 
   return (
     <PageTransition>
       <SideBar currentUser={currentUser} />
+      <TopBar />
 
       {selectedImage && (
         <div
@@ -209,7 +250,6 @@ export default function ShowPage() {
       )}
 
       <div className="max-w-3xl mx-auto p-6">
-
         <Link
           to="/dashboard/community"
           className="inline-flex items-center gap-2 text-base-content/60 hover:text-primary text-sm mb-4 transition"
@@ -239,13 +279,12 @@ export default function ShowPage() {
 
           {entry.images?.length > 1 && (
             <span className="absolute bottom-4 right-4 bg-base-100/90 backdrop-blur-sm text-base-content text-xs font-medium px-3 py-1.5 rounded-full">
-             <a href="#photo"> View all photos ({entry.images.length})</a>
+              <a href="#photo"> View all photos ({entry.images.length})</a>
             </span>
           )}
         </div>
-                {/* Meta row */}
+        {/* Meta row */}
         <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 mb-6">
-
           <div className="border border-base-300 rounded-xl p-3">
             <p className="text-xs font-semibold text-base-content/60 mb-1">
               Mood
@@ -256,9 +295,7 @@ export default function ShowPage() {
                 {moodEmojis[entry.mood]} {entry.mood}
               </p>
             ) : (
-              <p className="text-sm text-base-content/40">
-                Not set
-              </p>
+              <p className="text-sm text-base-content/40">Not set</p>
             )}
           </div>
 
@@ -285,9 +322,7 @@ export default function ShowPage() {
                 )}
               </div>
             ) : (
-              <p className="text-sm text-base-content/40">
-                None
-              </p>
+              <p className="text-sm text-base-content/40">None</p>
             )}
           </div>
 
@@ -306,7 +341,6 @@ export default function ShowPage() {
               {entry.isPublic ? "Public" : "Private"}
             </div>
           </div>
-
         </div>
 
         {/* Title */}
@@ -317,16 +351,9 @@ export default function ShowPage() {
         {/* Verse card */}
         {entry.verse && (
           <div className="bg-primary/10 rounded-2xl p-5 mb-6 flex gap-3">
+            <BookOpen className="text-primary shrink-0 mt-0.5" size={20} />
 
-            <BookOpen
-              className="text-primary flex-shrink-0 mt-0.5"
-              size={20}
-            />
-
-            <p className="text-primary italic leading-relaxed">
-              {entry.verse}
-            </p>
-
+            <p className="text-primary italic leading-relaxed">{entry.verse}</p>
           </div>
         )}
 
@@ -339,7 +366,6 @@ export default function ShowPage() {
         {/* Tags */}
         {entry.tags?.length > 0 && (
           <div className="flex gap-2 flex-wrap mb-6">
-
             {entry.tags.map((tag, i) => (
               <span
                 key={i}
@@ -348,10 +374,9 @@ export default function ShowPage() {
                 #{tag}
               </span>
             ))}
-
           </div>
         )}
-                {/* Like button */}
+        {/* Like button */}
         {entry.isPublic && (
           <div className="flex items-center gap-2 mb-6">
             <button
@@ -369,12 +394,27 @@ export default function ShowPage() {
               />
               {likeCount} {likeCount === 1 ? "Like" : "Likes"}
             </button>
+
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowReportModal(true);
+              }}
+              className="flex items-center gap-1.5 text-sm text-base-content/70 hover:text-red-500 transition"
+            >
+              <Flag size={17} />
+              Report
+            </button>
           </div>
         )}
 
         {/* Photo grid */}
         {entry.images?.length >= 1 && (
-          <div id="photo" className="grid grid-cols-4 sm:grid-cols-4 gap-3 mb-6">
+          <div
+            id="photo"
+            className="grid grid-cols-4 sm:grid-cols-4 gap-3 mb-6"
+          >
             {entry.images.map((img, i) => (
               <div key={i} className="relative">
                 <img
@@ -407,7 +447,7 @@ export default function ShowPage() {
             Posted by{" "}
             <Link
               to={`/users/${entry.author._id}`}
-              className="font-medium text-primary hover:underline"
+              className="font-medium text-primary underline decoration-primary underline-offset-2 hover:decoration-primary active:opacity-60 transition-colors"
             >
               {entry.author.username}
             </Link>
@@ -415,25 +455,34 @@ export default function ShowPage() {
         )}
 
         {/* Owner actions */}
-        {isOwner && (
-          <div className="flex gap-3 mb-8">
+
+        <div className="flex gap-3 mb-8">
+          {isOwner && (
             <Link
               to={`/entries/${entry._id}/edit`}
-              className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition"
+              className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg"
             >
               Edit Entry
             </Link>
+          )}
 
+          {(isOwner || isAdmin) && (
             <button
               onClick={handleDelete}
-              className="flex items-center gap-1.5 bg-error/10 text-error text-sm font-medium px-4 py-2 rounded-lg hover:bg-error/20 transition"
+              disabled={deletingEntry}
+              className="flex items-center gap-1.5 bg-error/10 text-error text-sm font-medium px-4 py-2 rounded-lg hover:bg-error/20 active:scale-95 transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              <Trash2 size={15} />
-              Delete
+              {deletingEntry ? (
+                <span className="loading loading-spinner loading-xs" />
+              ) : (
+                <Trash2 size={15} />
+              )}
+              {deletingEntry ? "Deleting..." : "Delete"}
             </button>
-          </div>
-        )}
-                {/* Comments — only if public */}
+          )}
+        </div>
+
+        {/* Comments — only if public */}
         {entry.isPublic && (
           <div className="border-t border-base-300 pt-6">
             <h3 className="text-lg font-semibold text-base-content mb-4">
@@ -458,21 +507,25 @@ export default function ShowPage() {
             <div className="flex flex-col gap-4">
               {entry.comment?.map((c) => (
                 <div key={c._id} className="flex gap-3">
-
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
                     {c.author?.username?.charAt(0).toUpperCase()}
                   </div>
 
-                  <div className="flex-1">
+                  {/* {currentUser?.profilePic?.url ? (
+            <img src={currentUser.profilePic.url} className="rounded-full w-9 h-9 object-cover" />
+        ) : (
+            <span className="text-sm font-bold">
+                {currentUser?.username?.charAt(0).toUpperCase()}
+            </span>
+        )} */}
 
+                  <div className="flex-1">
                     <span className="font-semibold text-primary">
                       {c.author?.username}
                     </span>
 
                     {editingCommentId === c._id ? (
-
                       <div className="flex gap-2 mt-1">
-
                         <input
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
@@ -492,37 +545,30 @@ export default function ShowPage() {
                         >
                           Cancel
                         </button>
-
                       </div>
-
                     ) : (
-
-                      <p className="text-base-content/80 text-sm">
-                        {c.text}
-                      </p>
-
+                      <p className="text-base-content/80 text-sm">{c.text}</p>
                     )}
-
                   </div>
 
                   {currentUser &&
-                    c.author &&
-                    c.author._id?.toString() ===
-                      currentUser._id?.toString() && (
-
+                    (c.author?._id?.toString() ===
+                      currentUser._id?.toString() ||
+                      currentUser.role === "admin") && (
                       <div className="flex items-center gap-5 ml-auto">
-
-                        {editingCommentId !== c._id && (
-                          <button
-                            onClick={() => {
-                              setEditingCommentId(c._id);
-                              setEditText(c.text);
-                            }}
-                            className="text-primary hover:opacity-80 transition"
-                          >
-                            <SquarePen size={18} />
-                          </button>
-                        )}
+                        {c.author?._id?.toString() ===
+                          currentUser._id?.toString() &&
+                          editingCommentId !== c._id && (
+                            <button
+                              onClick={() => {
+                                setEditingCommentId(c._id);
+                                setEditText(c.text);
+                              }}
+                              className="text-primary hover:opacity-80 transition"
+                            >
+                              <SquarePen size={18} />
+                            </button>
+                          )}
 
                         <button
                           onClick={() => handleDeleteComment(c._id)}
@@ -530,13 +576,44 @@ export default function ShowPage() {
                         >
                           <Trash2 size={18} />
                         </button>
-
                       </div>
-
                     )}
-
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+        {showReportModal && (
+          <div className="modal modal-open">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Report Entry</h3>
+
+              <textarea
+                className="textarea textarea-bordered w-full mt-4"
+                placeholder="Why are you reporting this entry?"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+              />
+
+              <div className="modal-action">
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setShowReportModal(false);
+                    setReason("");
+                  }}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="btn btn-error"
+                  disabled={loading}
+                  onClick={handleReport}
+                >
+                  {loading ? "Submitting..." : "Submit Report"}
+                </button>
+              </div>
             </div>
           </div>
         )}

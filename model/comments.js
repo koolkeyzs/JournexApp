@@ -13,7 +13,18 @@ author:
            type: Schema.Types.ObjectId,
         ref: 'User'
   
-        }
+        },
+
+        entry: {
+        type: Schema.Types.ObjectId,
+        ref: 'Journex'
+    },
+
+
+         createdAt: {
+        type: Date,
+        default: Date.now
+    },
 })
 
 

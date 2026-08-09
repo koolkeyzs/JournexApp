@@ -1,3 +1,8 @@
+
+
+
+
+
 // if(process.env.NODE_ENV !== 'production'){
 //     require('dotenv').config()
 // }
@@ -29,23 +34,18 @@
 // const User = require('./model/user')
 // const helmet = require('helmet')
 // const cors = require('cors')
-// const dbUrl =  'mongodb://localhost:27017/Journex'
-
-
+// const dbUrl = process.env.DB_ACCESS
 
 // const { MongoStore } = require('connect-mongo')
 
-
-
-
 // const allowedOrigins = [
 //   "http://localhost:5173",
-//   " http://192.168.122.238:5173/", // update if your IP changes
+//   "http://192.168.122.238:5173", // update if your IP changes
+//   process.env.CLIENT_URL, // your real deployed frontend URL, set in Render's env vars
 // ];
 
 // app.use(cors({
 //   origin: function (origin, callback) {
-//     // allow requests with no origin (like Postman) or from allowed list
 //     if (!origin || allowedOrigins.includes(origin)) {
 //       callback(null, true);
 //     } else {
@@ -53,14 +53,11 @@
 //     }
 //   },
 //   credentials: true,
-//       origin: true, // allows ALL origins
-    
 // }));
 
 
-
 // app.engine('ejs' ,  Ejsmate)
-// // mongodb://localhost:27017/Journex
+
 // mongoose.connect(dbUrl)
 // const db = mongoose.connection;
 
@@ -82,10 +79,6 @@
 // app.use(express.urlencoded({extended:true}))
 
 
-
-
-
-
 // const store = new MongoStore({
 //     mongoUrl: dbUrl,
 //     touchAfter: 24 * 60 * 60,
@@ -94,7 +87,7 @@
 //     }
 // })
 // store.on('error' ,function (e){
-//     console.log ('session store error')
+//     console.log ('session store error', e)
 // })
 
 // const sessionConfig = {
@@ -105,9 +98,9 @@
 //     saveUninitialized: true,
 //     cookie: {
 //         httpOnly: true,
-//         secure: false,       // explicit false since you're on http:// locally
-//         sameSite: 'lax',     // explicit, don't rely on browser default
-//         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days — recalculated correctly per session
+//         secure: process.env.NODE_ENV === 'production',
+//         sameSite: 'lax',
+//         maxAge: 1000 * 60 * 60 * 24 * 7,
 //     }
 // }
 
@@ -128,10 +121,7 @@
 
 
 // app.use((req , res , next) =>{
-//     console.log(req.query)
 //     res.locals.currentUser = req.user
-//     // res.locals.success = req.flash('success')
-//     // res.locals.error = req.flash('error')
 //     next()
 // })
 
@@ -140,7 +130,6 @@
 
 // app.get('/' , (req , res) =>{
 //     res.render('home')
-
 // })
 
 
@@ -180,7 +169,7 @@
 // })
 
 
-
-// app.listen(3000  , '0.0.0.0',()=>{
-//  console.log('APP IS LISTENING AT PORT 3000')
+// const PORT = process.env.PORT || 3000
+// app.listen(PORT, '0.0.0.0', ()=>{
+//  console.log(`APP IS LISTENING AT PORT ${PORT}`)
 // })

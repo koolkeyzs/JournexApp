@@ -14,6 +14,13 @@ import { AnimatePresence } from "framer-motion";
 import ChangePassword from "./pages/ChangePassword";
 import PublicProfile from "./pages/PublicProfile";
 import WhatsNewPage from "./pages/Roadmap";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminReports from "./pages/AdminReports";
+import AdminUsers from "./pages/AdminUsers";
+import MyReports from "./pages/Myreports";
+import AdminEntries from "./pages/AdminEntries";
+import AdminComments from "./pages/AdminComments";
+import AdminAnnouncement from "./pages/AdminAnnouncement";
 // import EditComment from "./pages/EditComment";
 
 export default function App() {
@@ -30,9 +37,16 @@ export default function App() {
         <Route path="/entries" element={<NewEntry />} />
         <Route path="/entries/:id/edit" element={<EditPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/users/:id" element={<PublicProfile/>} />
+        <Route path="/users/:id" element={<PublicProfile />} />
         <Route path="/profile/change-password" element={<ChangePassword />} />
-        <Route path="/roadmap" element={<WhatsNewPage/>} />
+        <Route path="/roadmap" element={<WhatsNewPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/reports" element={<AdminReports />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/my-reports" element={<MyReports />} />
+        <Route path="/admin/entries" element={<AdminEntries />} />
+        <Route path="/admin/comments" element={<AdminComments />} />
+        <Route path="/admin/announcements" element={<AdminAnnouncement />} />
         {/* <Route path="/entries/:commentId/editComment" element={<EditComment/>} /> */}
       </Routes>
     </AnimatePresence>

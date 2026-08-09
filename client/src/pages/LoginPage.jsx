@@ -1,61 +1,44 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import PageTransition from '../Components/PageTransition'
 import toast from 'react-hot-toast'
 import api from '../api'
-import { useSearchParams } from 'react-router-dom'
-import { BookOpen, LogIn } from 'lucide-react'
+import { LogIn, Eye, EyeOff } from 'lucide-react'
 
 export default function Login() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+    const redirectTo = searchParams.get('redirect') || '/dashboard'
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault()
-    //     setLoading(true)
-    //     try {
-    //         await api.post('/login', { username, password })
-    //         toast.success('Welcome back! 🙏')
-    //         setTimeout(() => {
-    //             navigate('/dashboard')
-    //         }, 1500)
-    //     } catch (err) {
-    //         toast.error('Incorrect username or password')
-    //     } finally {
-    //         setLoading(false)
-    //     }
-    // }
-
-
-const [searchParams] = useSearchParams()
-const redirectTo = searchParams.get('redirect') || '/dashboard'
-
-const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    try {
-        await api.post('/login', { username, password })
-        toast.success('Welcome back! 🙏')
-        setTimeout(() => {
-            navigate(redirectTo) // redirects back to where they were!
-        }, 1500)
-    } catch (err) {
-        toast.error('Incorrect username or password')
-    } finally {
-        setLoading(false)
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        try {
+            await api.post('/login', { username, password })
+            toast.success('Welcome back! 🙏')
+            setTimeout(() => {
+                navigate(redirectTo)
+            }, 1500)
+        } catch (err) {
+            toast.error('Incorrect username or password')
+        } finally {
+            setLoading(false)
+        }
     }
-}
+
     return (
         <PageTransition>
-            <div className="min-h-screen bg-base-200 flex items-center justify-center px-4">
+            <div className="min-h-screen bg-base-200 flex items-center justify-center px-4 py-8">
                 <div className="card bg-base-100 shadow-xl w-full max-w-md">
-                    <div className="card-body">
+                    <div className="card-body p-6 sm:p-8">
 
                         {/* Logo */}
                         <div className="flex flex-col items-center mb-6">
-                            <BookOpen size={40} className="text-primary mb-2" />
+                            <img src="/JournexLogo.png" alt="Journex logo" className="h-12 object-contain mb-2" />
                             <h1 className="text-3xl font-bold text-primary">Journex</h1>
                             <p className="text-base-content/50 text-sm mt-1">Welcome back, believer 🙏</p>
                         </div>
@@ -70,7 +53,7 @@ const handleSubmit = async (e) => {
                                     placeholder="Enter your username"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="input input-bordered w-full  rounded-xl hover:border-primary focus:outline-none focus:border-primary transition-all duration-200"
+                                    className="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary transition-all duration-200"
                                     required
                                 />
                             </div>
@@ -79,14 +62,23 @@ const handleSubmit = async (e) => {
                                 <label className="label">
                                     <span className="label-text">Password</span>
                                 </label>
-                                <input
-                                    type="password"
-                                    placeholder="Enter your password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="input input-bordered w-full  rounded-xl hover:border-primary focus:outline-none focus:border-primary transition-all duration-200"
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        placeholder="Enter your password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary transition-all duration-200 pr-10"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content/70"
+                                    >
+                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
                             </div>
 
                             <button
@@ -113,10 +105,10 @@ const handleSubmit = async (e) => {
                         </p>
 
                         <p className="text-center text-sm text-base-content/50 mt-2">
-    <Link to="/" className="text-primary hover:underline">
-        ← Back to Home
-    </Link>
-</p>
+                            <Link to="/" className="text-primary hover:underline">
+                                ← Back to Home
+                            </Link>
+                        </p>
 
                     </div>
                 </div>

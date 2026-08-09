@@ -31,4 +31,5 @@ router.put('/profile/update', isLoggedIn, catchAsync(userController.updateProfil
 router.put('/profile/change-password', isLoggedIn, catchAsync(userController.changePassword))
 router.put('/profile/update-details', isLoggedIn, catchAsync(userController.updateDetails))
 router.get('/users/:id', isLoggedIn, catchAsync(userController.publicProfile))
+router.get('/my-reports', isLoggedIn, catchAsync(userController.myReports))
 module.exports = router;

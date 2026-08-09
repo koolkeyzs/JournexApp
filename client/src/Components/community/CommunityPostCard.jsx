@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, MessageCircle, BookOpen, Calendar } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  BookOpen,
+  Calendar,
+  Flag,
+} from "lucide-react";
 import api from "../../api";
+
 import toast from "react-hot-toast";
 
 const CommunityPostCard = ({ entry, currentUser }) => {
@@ -9,7 +16,9 @@ const CommunityPostCard = ({ entry, currentUser }) => {
     currentUser ? entry.likes?.includes(currentUser._id) : false
   );
   const [likeCount, setLikeCount] = useState(entry.likes?.length || 0);
-
+const [showReportModal, setShowReportModal] = useState(false);
+const [reason, setReason] = useState("");
+const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const { _id, title, content, images, author, createdAt } = entry;
@@ -46,6 +55,43 @@ const CommunityPostCard = ({ entry, currentUser }) => {
       toast.error("Failed to like entry");
     }
   };
+
+
+
+  const handleReport = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (!currentUser) {
+    toast.error("You must be logged in!");
+    navigate("/login");
+    return;
+  }
+
+  if (!reason.trim()) {
+    toast.error("Please provide a reason.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const { data } = await api.post(`/entries/${_id}/report`, {
+      reason,
+    });
+
+    toast.success(data.message);
+
+    setShowReportModal(false);
+    setReason("");
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message || "Failed to submit report."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="bg-base-100 rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden mb-5">
@@ -125,7 +171,57 @@ const CommunityPostCard = ({ entry, currentUser }) => {
           <MessageCircle size={17} />
           {entry.comment?.length || 0}
         </span>
+
+
+        <button
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowReportModal(true);
+  }}
+  className="flex items-center gap-1.5 text-sm text-base-content/70 hover:text-red-500 transition"
+>
+  <Flag size={17} />
+  Report
+</button>
       </div>
+
+      {showReportModal && (
+  <div className="modal modal-open">
+    <div className="modal-box">
+      <h3 className="font-bold text-lg">
+        Report Entry
+      </h3>
+
+      <textarea
+        className="textarea textarea-bordered w-full mt-4"
+        placeholder="Why are you reporting this entry?"
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+      />
+
+      <div className="modal-action">
+        <button
+          className="btn"
+          onClick={() => {
+            setShowReportModal(false);
+            setReason("");
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="btn btn-error"
+          disabled={loading}
+          onClick={handleReport}
+        >
+          {loading ? "Submitting..." : "Submit Report"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

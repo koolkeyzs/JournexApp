@@ -4,15 +4,7 @@ import toast from "react-hot-toast";
 import api from "../api";
 import PageTransition from "../Components/PageTransition";
 import RichTextEditor from "../Components/RichTexteditor";
-import {
-  Upload,
-  BookOpen,
-  Camera,
-  X,
-  Globe,
-  Lock,
-  Save,
-} from "lucide-react";
+import { Upload, BookOpen, Camera, X, Globe, Lock, Save } from "lucide-react";
 import MoodSelect from "../Components/moodselector";
 import SideBar from "../Components/Dashboard/sidebar";
 import TopBar from "../Components/Dashboard/navbar";
@@ -283,9 +275,6 @@ export default function NewEntry() {
 
               {/* Mood + Tags + Visibility */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-
-          
-
                 {/* Tags */}
                 <div className="bg-base-100 border border-base-300 rounded-xl p-4">
                   <p className="text-sm font-semibold text-base-content mb-1">
@@ -317,7 +306,7 @@ export default function NewEntry() {
                   />
                 </div>
 
-                 {/* Mood */}
+                {/* Mood */}
                 <div className="bg-base-100 border border-base-300 rounded-xl p-4">
                   <p className="text-sm font-semibold text-base-content mb-1">
                     Mood
@@ -378,7 +367,6 @@ export default function NewEntry() {
                     </button>
                   </div>
                 </div>
-
               </div>
 
               {/* Submit */}

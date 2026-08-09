@@ -1,5 +1,6 @@
 const Comment = require('../model/comments')
 const Journex = require ('../model/journex');
+const Report = require ('../model/report');
 const User = require ('../model/user');
 const {cloudinary} = require('../cloudinary/index')
 
@@ -131,4 +132,12 @@ module.exports.changePassword = async (req, res) => {
     const user = await User.findById(req.user._id)
     await user.changePassword(oldPassword, newPassword) // passport method!
     res.json({ message: 'Password changed!' })
+}
+
+module.exports.myReports = async (req, res) => {
+    const reports = await Report.find({ reporter: req.user._id })
+        .populate('entry')
+        .sort({ createdAt: -1 })
+
+    res.json({ reports })
 }
