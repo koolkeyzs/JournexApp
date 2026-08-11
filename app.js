@@ -14,7 +14,6 @@ app.set("query parser", "extended");
 
 const mongoose = require("mongoose");
 const path = require("path");
-const Ejsmate = require("ejs-mate");
 
 const Journex = require("./model/journex");
 const catchAsync = require("./utils/CatchAsync");
@@ -127,10 +126,6 @@ app.use(
   }),
 );
 
-app.set("views", path.join(__dirname, "views"));
-
-app.set("view engine", "ejs");
-
 app.use(
   express.urlencoded({
     extended: true,
@@ -223,10 +218,11 @@ app.use((req, res, next) => {
 
 // ============================================
 // ROUTES
-// ============================================
-
+// ==========
 app.get("/", (req, res) => {
-  res.render("home");
+  res.json({
+    message: "Journex API is live",
+  });
 });
 
 app.use("/entries", entryRoutes);
