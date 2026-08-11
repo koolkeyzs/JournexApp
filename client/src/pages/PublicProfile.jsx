@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import api from '../api'
 import PageTransition from '../Components/PageTransition'
 import SideBar from '../Components/Dashboard/sidebar'
-import CommunityPostCard from '../Components/Community/CommunityPostCard'
+import CommunityPostCard from '../Components/community/CommunityPostCard'
 import { Calendar, BookOpen, X } from 'lucide-react'
 
 export default function PublicProfile() {
