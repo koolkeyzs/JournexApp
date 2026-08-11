@@ -1,4 +1,6 @@
 const Notification = require('../model/notification')
+const User = require('../model/user')
+const webpush = require('../utils/webPush')
 
 module.exports.getNotifications = async (req, res) => {
     const notifications = await Notification.find({ recipient: req.user._id })
@@ -40,4 +42,29 @@ module.exports.markAllAsRead = async (req, res) => {
     )
 
     res.json({ message: 'All notifications marked as read!' })
+}
+
+
+module.exports.subscribeToPush = async (req , res) =>{
+    const {subscription} = req.body
+
+    if(!subscription){
+        return res.status(400).json({message : 'push notification is required'})
+    }
+
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {pushSubscription : subscription}, 
+       {new :true} 
+    )
+
+
+    res.status(201).json({message : 'Push notification enabled successfully'})
+}
+
+
+module.exports.getPushNotificationStatus = async (req , res) =>{
+    const user = await User.findById(req.user._id).select('pushSubscription')
+
+    res.json({enabled : !!user?.pushSubscription})
 }

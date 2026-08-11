@@ -13,12 +13,15 @@ import {
   Flag,
   ShieldCheck,
   LockIcon,
+  Settings,
   UnlockIcon
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api";
+
+
 
 const SideBar = ({ currentUser }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +41,7 @@ const SideBar = ({ currentUser }) => {
   },
   {
     to: "/dashboard/private",
-    icon: <UnlockIcon size={18} />,
+    icon: <LockIcon size={18} />,
     label: "Private Journal",
   },
   {
@@ -51,11 +54,11 @@ const SideBar = ({ currentUser }) => {
     icon: <PenSquare size={18} />,
     label: "Create New Entry",
   },
-  {
-    to: "/profile",
-    icon: <User size={18} />,
-    label: "Profile",
-  },
+  // {
+  //   to: "/profile",
+  //   icon: <User size={18} />,
+  //   label: "Profile",
+  // },
 
   {
   to: "/my-reports",
@@ -67,6 +70,16 @@ const SideBar = ({ currentUser }) => {
     icon: <BookOpenCheck size={18} />,
     label: "What's Next??",
   },
+
+  {
+    to: "/settings",
+    icon: <Settings size={18} />,
+    label: "Settings",
+  },
+
+
+  
+              
 
   ...(currentUser?.role === "admin"
     ? [
@@ -113,6 +126,8 @@ const SideBar = ({ currentUser }) => {
     Reflect. Grow. Inspire.
   </p>
 </div>
+
+               
 
         {/* Nav Links */}
         <nav className="flex-1 p-4 flex flex-col gap-1">

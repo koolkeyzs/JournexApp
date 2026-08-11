@@ -5,6 +5,7 @@ const Journex = require('../model/journex');
 const Report = require('../model/report');
 const Notification = require('../model/notification');
 const User = require('../model/user');
+const createNotification = require('../utils/createNotification')
 
 const {cloudinary} = require('../cloudinary/index')
 
@@ -29,17 +30,23 @@ module.exports.createForm = async (req, res, next) => {
         await entries.save()
 
         if (entries.isPublic) {
-            const otherUsers = await User.find({ _id: { $ne: req.user._id } }).select('_id')
-            const notifications = otherUsers.map(user => ({
-                recipient: user._id,
-                sender: req.user._id,
-                type: 'new_entry',
-                entry: entries._id
-            }))
+            const otherUsers = await User.find({
+    _id: { $ne: req.user._id }
+}).select('_id')
 
-            if (notifications.length > 0) {
-                await Notification.insertMany(notifications)
-            }
+await Promise.all(
+    otherUsers.map(user =>
+        createNotification({
+            recipient: user._id,
+            sender: req.user._id,
+            type: 'new_entry',
+            entry: entries._id,
+            title: 'New Journex entry 📝',
+            body: `${req.user.username} just shared a new entry.`
+        })
+    )
+)
+           
         }
 
         res.json({ id: entries._id, message: 'Entry created!' })
@@ -103,17 +110,24 @@ module.exports.editLogicRoute = async (req, res) => {
     }
 
     if (entries.isPublic && existingEntry && !existingEntry.isPublic) {
-        const otherUsers = await User.find({ _id: { $ne: req.user._id } }).select('_id')
-        const notifications = otherUsers.map(user => ({
+        const otherUsers = await User.find({
+    _id: { $ne: req.user._id }
+}).select('_id')
+
+await Promise.all(
+    otherUsers.map(user =>
+        createNotification({
             recipient: user._id,
             sender: req.user._id,
             type: 'new_entry',
-            entry: entries._id
-        }))
+            entry: entries._id,
+            title: 'New Journex entry 📝',
+            body: `${req.user.username} just shared a new entry.`
+        })
+    )
+)
 
-        if (notifications.length > 0) {
-            await Notification.insertMany(notifications)
-        }
+        
     }
 
     res.json({ id: entries._id, message: 'Successfully updated this entry!' })
@@ -200,11 +214,13 @@ module.exports.toggleLike = async (req, res) => {
         await Journex.findByIdAndUpdate(id, { $push: { likes: userId } })
 
         if (entry.author && entry.author.toString() !== userId.toString()) {
-            await Notification.create({
+            await createNotification({
                 recipient: entry.author,
                 sender: userId,
                 type: 'like',
-                entry: entry._id
+                entry: entry._id,
+                title: 'Someone liked your entry',
+                body: 'Someone just liked your journex entry'
             })
         }
 

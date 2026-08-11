@@ -30,6 +30,11 @@ const userSchema = new Schema({
         type : String,
         enum:['user' , 'admin'],
         default: 'user'
+    },
+
+    pushSubscription: {
+        type : Object,
+        default:null
     }
 
 })

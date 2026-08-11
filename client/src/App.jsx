@@ -21,6 +21,7 @@ import MyReports from "./pages/Myreports";
 import AdminEntries from "./pages/AdminEntries";
 import AdminComments from "./pages/AdminComments";
 import AdminAnnouncement from "./pages/AdminAnnouncement";
+import Settings from "./pages/Settings";
 // import EditComment from "./pages/EditComment";
 
 export default function App() {
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="/admin/entries" element={<AdminEntries />} />
         <Route path="/admin/comments" element={<AdminComments />} />
         <Route path="/admin/announcements" element={<AdminAnnouncement />} />
+        <Route path="/settings" element={<Settings/>} />
         {/* <Route path="/entries/:commentId/editComment" element={<EditComment/>} /> */}
       </Routes>
     </AnimatePresence>

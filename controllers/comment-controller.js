@@ -1,6 +1,7 @@
 const Comment = require('../model/comments')
 const Journex = require('../model/journex');
 const Notification = require('../model/notification')
+const createNotification = require('../utils/createNotification')
 
 module.exports.createComment = async(req, res) => {
     const entries = await Journex.findById(req.params.id)
@@ -12,12 +13,14 @@ module.exports.createComment = async(req, res) => {
     await entries.save()
 
     if (entries.author && entries.author.toString() !== req.user._id.toString()) {
-        await Notification.create({
+        await createNotification({
             recipient: entries.author,
             sender: req.user._id,
             type: 'comment',
             entry: entries._id,
-            comment: comment._id
+            comment: comment._id,
+            title: 'new comment on entry',
+                body: 'Someone just commented your journex entry'
         })
     }
 

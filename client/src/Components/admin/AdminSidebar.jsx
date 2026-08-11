@@ -100,12 +100,6 @@ export default function AdminSidebar() {
                         </NavLink>
                     </li>
 
-                    {/* <li>
-                        <NavLink to="/admin/settings">
-                            <Settings size={20}/>
-                            Settings
-                        </NavLink>
-                    </li> */}
                 </ul>
 
               <div className="absolute bottom-6 left-0 right-0 px-4">
