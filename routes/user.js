@@ -16,7 +16,6 @@ router.route('/register')
 
 
 router.route('/login')
-// .get(userController.loginRenderForm )
 .post(storeReturnTo, passport.authenticate('local', {
     failureMessage: true,
     failureWithError: true

@@ -39,12 +39,23 @@ res.status(400).json({ message:e.message})
 // }
 
 
-module.exports.loginUser = (req , res) =>{
-    const redirectUrl = res.locals?.returnTo || '/dashboard'  // 👈 use optional chaining
-    req.flash('success' , 'Welcome Back')
-    delete req.session.returnTo
-    res.json({ message: 'Welcome Back!' })
-  
+module.exports.loginUser = (req, res) => {
+    req.login(req.user, (err) => {
+        if (err) {
+            console.error("LOGIN SESSION ERROR:", err)
+            return res.status(500).json({
+                message: "Could not create login session"
+            })
+        }
+
+        req.flash('success', 'Welcome Back')
+
+        delete req.session.returnTo
+
+        res.json({
+            message: 'Welcome Back!'
+        })
+    })
 }
 
 
