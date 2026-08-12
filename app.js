@@ -56,10 +56,10 @@ const PORT = process.env.PORT || 3000;
 
 const dbUrl = process.env.DB_ACCESS;
 
-const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const clientUrl = process.env.CLIENT_URL;
 
 if (!dbUrl) {
-  console.error("❌ MONGODB_ACCESS is not defined");
+  console.error("❌ DB_ACCESS is not defined");
   process.exit(1);
 }
 
@@ -73,20 +73,13 @@ if (!process.env.SESSION_SECRET) {
 // ============================================
 
 const allowedOrigins = [
-    "http://journex-app.vercel.app/"
+    "https://journex-app.vercel.app"
 ]
 
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true)
-        } else {
-            callback(new Error("Not allowed by CORS"))
-        }
-    },
+    origin : clientUrl,
     credentials: true
 }))
-
 // ============================================
 // DATABASE
 // ============================================
