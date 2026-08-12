@@ -72,27 +72,20 @@ if (!process.env.SESSION_SECRET) {
 // CORS
 // ============================================
 
-const allowedOrigins = ["http://localhost:5173", clientUrl];
+const allowedOrigins = [
+    "http://journex-app.vercel.app/"
+]
 
-app.use(
-  cors({
+app.use(cors({
     origin: function (origin, callback) {
-      // Allow requests without an origin
-      // (Postman, server-side requests, etc.)
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"));
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
     },
-
-    credentials: true,
-  }),
-);
+    credentials: true
+}))
 
 // ============================================
 // DATABASE
@@ -168,9 +161,9 @@ const sessionConfig = {
   cookie: {
     httpOnly: true,
 
-    secure: isProduction,
+    secure: true,
 
-    sameSite: isProduction ? "none" : "lax",
+    sameSite: 'none',
 
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },
