@@ -15,6 +15,10 @@ export default function PublicProfile() {
     const [showEntries, setShowEntries] = useState(false)
     const { id } = useParams()
 
+
+
+    
+
     useEffect(() => {
         async function fetchData() {
             try {
