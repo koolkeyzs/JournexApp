@@ -17,22 +17,28 @@ self.addEventListener('push' , (event)=>{
 
 
 self.addEventListener("notificationclick", (event) => {
-    event.notification.close()
+  event.notification.close();
 
-    const targetUrl = "https://journex-app.vercel.app/dashboard"
+  event.waitUntil(
+    clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    }).then((clientList) => {
 
-    event.waitUntil(
-        clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-            for (const client of clientList) {
-                if (client.url.includes(self.location.origin) && "focus" in client) {
-                    return client.focus()
-                }
-            }
+      // If Journex is already open, focus it
+      for (const client of clientList) {
+        if ("focus" in client) {
+          return client.focus();
+        }
+      }
 
-            if (clients.openWindow) {
-                return clients.openWindow(targetUrl)
-            }
-        })
-    )
-})
+      // If Journex isn't open, open it at its root
+      if (clients.openWindow) {
+        return clients.openWindow("/");
+      }
+    })
+  );
+});
+
+
 
