@@ -10,6 +10,7 @@ import DailyRandVerse from "../Components/Dashboard/DailyRandVerse";
 import RecentEntries from "../Components/Dashboard/RecentEntriesLogic";
 import ContinueDraft from "../Components/Dashboard/Draft";
 import TrendingCommunity from "../Components/Dashboard/TrendingComm";
+import BottomNav from "../Components/BotttomNav";
 import AnnouncementBanner from "../Components/admin/AnnouncementBanner";
 
 export default function Dashboard() {
@@ -83,7 +84,7 @@ export default function Dashboard() {
             </div>
           </main>
         </div>
-
+   <BottomNav/>
       </div>
     </PageTransition>
   );
