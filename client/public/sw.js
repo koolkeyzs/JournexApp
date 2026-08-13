@@ -17,22 +17,22 @@ self.addEventListener('push' , (event)=>{
 
 
 self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
+    event.notification.close()
 
-  event.waitUntil(
-    clients.matchAll({
-      type: "window",
-      includeUncontrolled: true,
-    }).then((clientList) => {
-      for (const client of clientList) {
-        if ("focus" in client) {
-          return client.focus();
-        }
-      }
+    const targetUrl = "https://journex-app.vercel.app/dashboard"
 
-      if (clients.openWindow) {
-        return clients.openWindow("https://journex-app.vercel.app/");
-      }
-    })
-  );
-});
+    event.waitUntil(
+        clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+            for (const client of clientList) {
+                if (client.url.includes(self.location.origin) && "focus" in client) {
+                    return client.focus()
+                }
+            }
+
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl)
+            }
+        })
+    )
+})
+
