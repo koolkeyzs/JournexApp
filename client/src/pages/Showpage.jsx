@@ -58,6 +58,7 @@ export default function ShowPage() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [savingCommentId, setSavingCommentId] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -145,7 +146,10 @@ export default function ShowPage() {
   };
 
   const handleEditComment = async (commentId) => {
+    if (savingCommentId) return;
+
     try {
+      setSavingCommentId(commentId);
       await api.put(`/entries/${id}/comments/${commentId}`, {
         comment: { text: editText },
       });
@@ -154,7 +158,9 @@ export default function ShowPage() {
       setEditingCommentId(null);
       fetchData();
     } catch (err) {
-      toast.error("Failed to update comment");
+      toast.error(err.response?.data?.message || "Failed to update comment");
+    } finally {
+      setSavingCommentId(null);
     }
   };
 
@@ -212,7 +218,7 @@ export default function ShowPage() {
 
   if (!entry)
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pb-28">
         <LoadingScreen />
       </div>
     );
@@ -542,19 +548,26 @@ export default function ShowPage() {
                         <input
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
-                          className="flex-1 border border-primary/30 bg-base-100 text-base-content rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-primary"
+                          disabled={savingCommentId === c._id}
+                          className="flex-1 border border-primary/30 bg-base-100 text-base-content rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
                         />
 
                         <button
                           onClick={() => handleEditComment(c._id)}
-                          className="bg-primary text-primary-content text-xs px-3 py-1 rounded-lg hover:bg-primary/90 transition"
+                          disabled={savingCommentId === c._id}
+                          className="bg-primary text-primary-content text-xs px-3 py-1 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1.5"
                         >
-                          Save
+                          {savingCommentId === c._id ? (
+                            <span className="loading loading-spinner loading-xs" />
+                          ) : (
+                            "Save"
+                          )}
                         </button>
 
                         <button
                           onClick={() => setEditingCommentId(null)}
-                          className="bg-base-200 text-base-content text-xs px-3 py-1 rounded-lg hover:bg-base-300 transition"
+                          disabled={savingCommentId === c._id}
+                          className="bg-base-200 text-base-content text-xs px-3 py-1 rounded-lg hover:bg-base-300 transition disabled:opacity-50"
                         >
                           Cancel
                         </button>
@@ -635,7 +648,7 @@ export default function ShowPage() {
             </div>
           </div>
         )}
-        <BottomNav/>
+        <BottomNav />
       </div>
     </PageTransition>
   );

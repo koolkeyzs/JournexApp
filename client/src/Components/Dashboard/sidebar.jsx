@@ -20,13 +20,24 @@ import api from "../../api";
 
 const SideBar = ({ currentUser }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await api.get("/logout", { withCredentials: true });
-    toast.success("Goodbye! 🙏");
-    navigate("/");
+    if (loggingOut) return;
+
+    try {
+      setLoggingOut(true);
+      await api.get("/logout", { withCredentials: true });
+      toast.success("Goodbye! 🙏");
+      navigate("/");
+    } catch (err) {
+      toast.error("Failed to log out");
+      setLoggingOut(false);
+    }
   };
+
+  // ...rest of your component unchanged
 
   const navLinks = [
     {
@@ -199,13 +210,18 @@ const SideBar = ({ currentUser }) => {
           </Link>
 
           {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="btn btn-outline btn-error btn-sm w-full gap-2"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
+         <button
+    onClick={handleLogout}
+    disabled={loggingOut}
+    className="btn btn-outline btn-error btn-sm w-full gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+>
+    {loggingOut ? (
+        <span className="loading loading-spinner loading-xs" />
+    ) : (
+        <LogOut size={16} />
+    )}
+    {loggingOut ? "Logging out..." : "Logout"}
+</button>
         </div>
       </aside>
     </>

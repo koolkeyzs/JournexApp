@@ -41,7 +41,7 @@ export default function CommunityFeed() {
 
   return (
     <PageTransition>
-      <div className="flex bg-base-200 min-h-screen">
+      <div className="flex bg-base-200 min-h-screen pb-28">
         <SideBar currentUser={currentUser} />
 
         <div className="flex-1 md:ml-64">
