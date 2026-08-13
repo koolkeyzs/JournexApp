@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import SideBar from "../Components/Dashboard/sidebar";
 import LoadingScreen from "../Components/LoadingScreen";
+import BottomNav from "../Components/BotttomNav";
 
 const moodEmojis = {
   Joyful: "😊",
@@ -634,6 +635,7 @@ export default function ShowPage() {
             </div>
           </div>
         )}
+        <BottomNav/>
       </div>
     </PageTransition>
   );
