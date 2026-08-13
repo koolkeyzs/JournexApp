@@ -218,7 +218,7 @@ export default function ShowPage() {
 
   if (!entry)
     return (
-      <div className="min-h-screen flex items-center justify-center pb-28">
+      <div className="min-h-screen flex items-center justify-center">
         <LoadingScreen />
       </div>
     );
@@ -247,7 +247,7 @@ export default function ShowPage() {
 
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 pb-28"
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl w-full">
