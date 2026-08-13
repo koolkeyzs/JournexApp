@@ -45,6 +45,7 @@ const moodEmojis = {
 export default function ShowPage() {
   const [entry, setEntry] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [expandedReplies, setExpandedReplies] = useState({});
   const [comment, setComment] = useState("");
   const [postingComment, setPostingComment] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
@@ -259,121 +260,55 @@ export default function ShowPage() {
 
 
 
-  // Separate top-level comments from replies, then attach each reply to its parent
-const topLevelComments = entry.comment?.filter(c => !c.parentComment) || [];
-const getReplies = (parentId) =>
-    entry.comment?.filter(c => c.parentComment === parentId) || [];
+  
+const comments = entry.comment || [];
 
-
-
-
-const CommentItem = ({
-    c,
-    currentUser,
-    isReply,
-    editingCommentId,
-    setEditingCommentId,
-    editText,
-    setEditText,
-    savingCommentId,
-    handleEditComment,
-    deletingCommentId,
-    handleDeleteComment,
-    setReplyingTo,
-    setComment,
-    setSelectedImage,
-}) => (
-    <div className={`flex gap-3 ${isReply ? "ml-10 mt-3" : ""}`}>
-        <div
-            className={`${isReply ? "w-6 h-6" : "w-8 h-8"} rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden cursor-pointer`}
-            onClick={() => c.author?.profilePic?.url && setSelectedImage(c.author.profilePic.url)}
-        >
-            {c.author?.profilePic?.url ? (
-                <img src={c.author.profilePic.url} className="w-full h-full object-cover" />
-            ) : (
-                c.author?.username?.charAt(0).toUpperCase()
-            )}
-        </div>
-
-        <div className="flex-1">
-            <Link
-                to={`/users/${c.author?._id}`}
-                className="font-semibold text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary active:opacity-60 transition-colors text-sm"
-            >
-                {c.author?.username}
-            </Link>
-
-            {editingCommentId === c._id ? (
-                <div className="flex gap-2 mt-1">
-                    <input
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        disabled={savingCommentId === c._id}
-                        className="flex-1 border border-primary/30 bg-base-100 text-base-content rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
-                    />
-                    <button
-                        onClick={() => handleEditComment(c._id)}
-                        disabled={savingCommentId === c._id}
-                        className="bg-primary text-primary-content text-xs px-3 py-1 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1.5"
-                    >
-                        {savingCommentId === c._id ? <span className="loading loading-spinner loading-xs" /> : "Save"}
-                    </button>
-                    <button
-                        onClick={() => setEditingCommentId(null)}
-                        disabled={savingCommentId === c._id}
-                        className="bg-base-200 text-base-content text-xs px-3 py-1 rounded-lg hover:bg-base-300 transition disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            ) : (
-                <p className="text-base-content/80 text-sm">{c.text}</p>
-            )}
-        </div>
-
-        <div className="flex items-center gap-4 ml-auto">
-            {currentUser && (
-                <button
-                    onClick={() => {
-                        setReplyingTo(c);
-                        setComment("");
-                    }}
-                    className="text-primary hover:opacity-80 transition text-xs font-medium"
-                >
-                    Reply
-                </button>
-            )}
-
-            {currentUser &&
-                (c.author?._id?.toString() === currentUser._id?.toString() || currentUser.role === "admin") && (
-                    <>
-                        {c.author?._id?.toString() === currentUser._id?.toString() && editingCommentId !== c._id && (
-                            <button
-                                onClick={() => {
-                                    setEditingCommentId(c._id);
-                                    setEditText(c.text);
-                                }}
-                                className="text-primary hover:opacity-80 transition"
-                            >
-                                <SquarePen size={16} />
-                            </button>
-                        )}
-                        <button
-                            onClick={() => handleDeleteComment(c._id)}
-                            disabled={deletingCommentId === c._id}
-                            className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {deletingCommentId === c._id ? (
-                                <span className="loading loading-spinner loading-xs" />
-                            ) : (
-                                <Trash2 size={16} />
-                            )}
-                        </button>
-                    </>
-                )}
-        </div>
-    </div>
+const mainComments = comments.filter(
+  (comment) => !comment.parentComment
 );
+
+// Build a map of every comment's direct children
+const repliesByParent = comments.reduce((groups, comment) => {
+  if (comment.parentComment) {
+    const parentId =
+      comment.parentComment?._id || comment.parentComment;
+
+    if (!groups[parentId]) {
+      groups[parentId] = [];
+    }
+
+    groups[parentId].push(comment);
+  }
+
+  return groups;
+}, {});
+
+// Get ALL replies belonging to a main comment,
+// including replies to replies.
+const getThreadReplies = (mainCommentId) => {
+  const result = [];
+  const queue = [...(repliesByParent[mainCommentId] || [])];
+
+  while (queue.length > 0) {
+    const reply = queue.shift();
+
+    result.push(reply);
+
+    const children = repliesByParent[reply._id] || [];
+
+    queue.push(...children);
+  }
+
+  return result;
+};
+
+const toggleReplies = (commentId) => {
+  setExpandedReplies((prev) => ({
+    ...prev,
+    [commentId]: !prev[commentId],
+  }));
+};
+
 
   return (
     <PageTransition>
@@ -639,7 +574,7 @@ const CommentItem = ({
         {entry.isPublic && (
           <div className="border-t border-base-300 pt-6">
             <h3 className="text-lg font-semibold text-base-content mb-4">
-              Comments ({entry.comment?.length || 0})
+              Comments ({mainComments?.length || 0})
             </h3>
 
             {currentUser && (
@@ -696,49 +631,187 @@ const CommentItem = ({
               </form>
             )}
 
-           <div className="flex flex-col gap-5">
-    {topLevelComments.map((c) => (
-        <div key={c._id}>
-            <CommentItem
-                c={c}
-                currentUser={currentUser}
-                isReply={false}
-                editingCommentId={editingCommentId}
-                setEditingCommentId={setEditingCommentId}
-                editText={editText}
-                setEditText={setEditText}
-                savingCommentId={savingCommentId}
-                handleEditComment={handleEditComment}
-                deletingCommentId={deletingCommentId}
-                handleDeleteComment={handleDeleteComment}
-                setReplyingTo={setReplyingTo}
-                setComment={setComment}
-                setSelectedImage={setSelectedImage}
-            />
+            <div className="flex flex-col gap-4">
+              {mainComments?.map((c) => (
+                <div key={c._id} className="flex gap-3">
+                  <div
+                    className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden cursor-pointer"
+                    onClick={() =>
+                      c.author?.profilePic?.url &&
+                      setSelectedImage(c.author.profilePic.url)
+                    }
+                  >
+                    {c.author?.profilePic?.url ? (
+                      <img
+                        src={c.author.profilePic.url}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      c.author?.username?.charAt(0).toUpperCase()
+                    )}
+                  </div>
 
-            {/* Nested replies, indented under the parent */}
-            {getReplies(c._id).map((reply) => (
-                <CommentItem
-                    key={reply._id}
-                    c={reply}
-                    currentUser={currentUser}
-                    isReply={true}
-                    editingCommentId={editingCommentId}
-                    setEditingCommentId={setEditingCommentId}
-                    editText={editText}
-                    setEditText={setEditText}
-                    savingCommentId={savingCommentId}
-                    handleEditComment={handleEditComment}
-                    deletingCommentId={deletingCommentId}
-                    handleDeleteComment={handleDeleteComment}
-                    setReplyingTo={setReplyingTo}
-                    setComment={setComment}
-                    setSelectedImage={setSelectedImage}
-                />
-            ))}
+                  <div className="flex-1">
+                    <Link
+                      to={`/users/${c.author?._id}`}
+                      className="font-semibold text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary active:opacity-60 transition-colors"
+                    >
+                      {c.author?.username}
+                    </Link>
+
+                    {editingCommentId === c._id ? (
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          disabled={savingCommentId === c._id}
+                          className="flex-1 border border-primary/30 bg-base-100 text-base-content rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
+                        />
+
+                        <button
+                          onClick={() => handleEditComment(c._id)}
+                          disabled={savingCommentId === c._id}
+                          className="bg-primary text-primary-content text-xs px-3 py-1 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1.5"
+                        >
+                          {savingCommentId === c._id ? (
+                            <span className="loading loading-spinner loading-xs" />
+                          ) : (
+                            "Save"
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => setEditingCommentId(null)}
+                          disabled={savingCommentId === c._id}
+                          className="bg-base-200 text-base-content text-xs px-3 py-1 rounded-lg hover:bg-base-300 transition disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-base-content/80 text-sm">{c.text}</p>)}
+
+                      {getThreadReplies(c._id).length > 0 && (
+  <button
+    type="button"
+    onClick={() => toggleReplies(c._id)}
+    className="mt-2 text-primary text-sm font-semibold hover:opacity-80 transition"
+  >
+    {expandedReplies[c._id]
+      ? "Hide replies"
+      : `Show ${getThreadReplies(c._id).length} ${
+          getThreadReplies(c._id).length === 1
+            ? "reply"
+            : "replies"
+        }`}
+  </button>
+)}
+                  </div>
+
+                  <div className="flex items-center gap-5 ml-auto">
+                    {/* Reply button — everyone can reply */}
+                    {currentUser && (
+                      <button
+                        onClick={() => {
+                          setReplyingTo(c);
+                          setComment("");
+                        }}
+                        className="text-primary hover:opacity-80 transition text-sm font-medium"
+                      >
+                        Reply
+                      </button>
+                    )}
+
+                    {/* Edit + Delete — owner/admin only */}
+                    {currentUser &&
+                      (c.author?._id?.toString() ===
+                        currentUser._id?.toString() ||
+                        currentUser.role === "admin") && (
+                        <>
+                          {c.author?._id?.toString() ===
+                            currentUser._id?.toString() &&
+                            editingCommentId !== c._id && (
+                              <button
+                                onClick={() => {
+                                  setEditingCommentId(c._id);
+                                  setEditText(c.text);
+                                }}
+                                className="text-primary hover:opacity-80 transition"
+                              >
+                                <SquarePen size={18} />
+                              </button>
+                            )}
+
+                          <button
+                            onClick={() => handleDeleteComment(c._id)}
+                            disabled={deletingCommentId === c._id}
+                            className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {deletingCommentId === c._id ? (
+                              <span className="loading loading-spinner loading-xs" />
+                            ) : (
+                              <Trash2 size={18} />
+                            )}
+                          </button>
+                        </>
+                      )}
+                  </div>
+
+                  {expandedReplies[c._id] &&
+  getThreadReplies(c._id).length > 0 && (
+    <div className="mt-4 ml-8 pl-4 border-l-2 border-base-300 space-y-4">
+      {getThreadReplies(c._id).map((reply) => (
+        <div
+          key={reply._id}
+          className="flex gap-3"
+        >
+          {/* Avatar */}
+          <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
+            {reply.author?.profilePic?.url ? (
+              <img
+                src={reply.author.profilePic.url}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              reply.author?.username
+                ?.charAt(0)
+                .toUpperCase()
+            )}
+          </div>
+
+          {/* Reply */}
+          <div className="flex-1 min-w-0">
+            <Link
+              to={`/users/${reply.author?._id}`}
+              className="font-semibold text-primary text-sm"
+            >
+              {reply.author?.username}
+            </Link>
+
+            <p className="text-base-content/80 text-sm mt-0.5">
+              {reply.text}
+            </p>
+
+            {currentUser && (
+              <button
+                type="button"
+                onClick={() => {
+                  setReplyingTo(reply);
+                  setComment("");
+                }}
+                className="mt-1 text-xs text-primary font-medium hover:opacity-80"
+              >
+                Reply
+              </button>
+            )}
+          </div>
         </div>
-    ))}
-</div>
+      ))}
+    </div>
+  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
         {showReportModal && (
