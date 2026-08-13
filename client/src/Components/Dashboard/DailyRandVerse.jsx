@@ -44,51 +44,83 @@ const DailyRandVerse = ({ currentUser }) => {
 
     return (
         <div
-            className="w-full bg-base-100 rounded-2xl p-6 shadow-sm bg-cover bg-center"
+            className="relative w-full overflow-hidden rounded-2xl shadow-lg bg-cover bg-center"
             style={{
-                backgroundImage:
-                    "linear-gradient(rgba(45, 10, 80, 0.72), rgba(20, 5, 40, 0.78)), url('/verse-bg.jpg')",
+                backgroundImage: "url('/verse.png')",
             }}
         >
-            <div className="flex items-center gap-3 mb-4">
-                <div className="bg-white/15 text-white p-2 rounded-full backdrop-blur-sm">
-                    📖
+            {/* Dark purple overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-950/80 via-purple-900/65 to-black/75" />
+
+            {/* Card content */}
+            <div className="relative z-10 p-6 sm:p-7">
+
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
+                        <span className="text-xl">📖</span>
+                    </div>
+
+                    <div>
+                        <p className="text-white/70 text-xs font-medium uppercase tracking-[0.18em]">
+                            Daily inspiration
+                        </p>
+
+                        <h3 className="text-white font-semibold text-lg">
+                            Verse of the Day
+                        </h3>
+                    </div>
                 </div>
 
-                <h3 className="font-semibold text-white">
-                    Verse of the Day
-                </h3>
+                {/* Verse */}
+                <div className="mb-6">
+                    <p
+                        className="font-lora text-white text-xl sm:text-2xl italic leading-relaxed drop-shadow-md"
+                    >
+                        “{dailyVerse.text}”
+                    </p>
+
+                    <p className="font-lora text-white/90 font-medium mt-4 text-sm sm:text-base">
+                        — {dailyVerse.reference}
+                    </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+
+                    <button
+                        onClick={handleCopy}
+                        className="flex-1 flex items-center justify-center gap-2
+                        bg-white/15 backdrop-blur-md
+                        border border-white/20
+                        text-white text-sm font-medium
+                        px-4 py-2.5 rounded-xl
+                        hover:bg-white/25
+                        active:scale-[0.98]
+                        transition"
+                    >
+                        <Copy size={17} />
+                        Copy
+                    </button>
+
+                    <button
+                        onClick={handleShare}
+                        className="flex-1 flex items-center justify-center gap-2
+                        bg-white/15 backdrop-blur-md
+                        border border-white/20
+                        text-white text-sm font-medium
+                        px-4 py-2.5 rounded-xl
+                        hover:bg-white/25
+                        active:scale-[0.98]
+                        transition"
+                    >
+                        <Share2 size={17} />
+                        Share
+                    </button>
+
+                </div>
+
             </div>
-
-            <p className="font-lora italic text-white/95 leading-relaxed mb-4 drop-shadow-md">
-                "{dailyVerse.text}"
-            </p>
-
-            <p className="font-lora text-white/90 font-medium mb-5">
-                {dailyVerse.reference}
-            </p>
-
-            {/* Copy & Share */}
-            <div className="flex gap-3">
-
-                <button
-                    onClick={handleCopy}
-                    className="flex-1 flex items-center justify-center gap-2 bg-white/15 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-white/25 backdrop-blur-sm border border-white/20 transition"
-                >
-                    <Copy size={17} />
-                    Copy
-                </button>
-
-                <button
-                    onClick={handleShare}
-                    className="flex-1 flex items-center justify-center gap-2 bg-white/15 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-white/25 backdrop-blur-sm border border-white/20 transition"
-                >
-                    <Share2 size={17} />
-                    Share
-                </button>
-
-            </div>
-
         </div>
     );
 };
