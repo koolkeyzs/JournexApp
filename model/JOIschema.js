@@ -45,7 +45,11 @@ const entrySchema = joi.object({
 
 const commentSchema = joi.object({
     comment: joi.object({
-        text: joi.string().required().escapeHTML()
+        text: joi.string().required().escapeHTML(),
+
+        parentComment: joi.string()
+            .allow(null)
+            .optional()
     }).required()
 })
 
