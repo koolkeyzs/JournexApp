@@ -20,6 +20,14 @@ author:
         ref: 'Journex'
     },
 
+        parentComment: {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+        default: null
+    },
+
+
+
 
          createdAt: {
         type: Date,

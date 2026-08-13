@@ -59,6 +59,7 @@ export default function ShowPage() {
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [savingCommentId, setSavingCommentId] = useState(null);
+  const [replyingTo, setReplyingTo] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -111,24 +112,40 @@ export default function ShowPage() {
   };
 
   const handleComment = async (e) => {
-    e.preventDefault();
-    if (postingComment) return;
+  e.preventDefault();
 
-    try {
-      setPostingComment(true);
-      await api.post(`/entries/${id}/comments`, {
-        comment: { text: comment },
-      });
+  if (postingComment) return;
 
-      toast.success("Comment added!");
-      setComment("");
-      fetchData();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to add comment");
-    } finally {
-      setPostingComment(false);
-    }
-  };
+  if (!comment.trim()) {
+    toast.error("Please write something first.");
+    return;
+  }
+
+  try {
+    setPostingComment(true);
+
+    await api.post(`/entries/${id}/comments`, {
+      comment: {
+        text: comment,
+        parentComment: replyingTo?._id || null,
+      },
+    });
+
+    toast.success(replyingTo ? "Reply added!" : "Comment added!");
+
+    setComment("");
+    setReplyingTo(null);
+
+    fetchData();
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message ||
+        (replyingTo ? "Failed to add reply" : "Failed to add comment")
+    );
+  } finally {
+    setPostingComment(false);
+  }
+};
 
   const handleDeleteComment = async (commentId) => {
     if (deletingCommentId) return;
@@ -507,29 +524,60 @@ export default function ShowPage() {
               Comments ({entry.comment?.length || 0})
             </h3>
 
-            {currentUser && (
-              <form onSubmit={handleComment} className="flex gap-2 mb-6">
-                <input
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Write a comment..."
-                  disabled={postingComment}
-                  className="flex-1 border border-base-300 bg-base-100 text-base-content rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
-                />
+           {currentUser && (
+  <form onSubmit={handleComment} className="mb-6">
 
-                <button
-                  type="submit"
-                  disabled={postingComment}
-                  className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {postingComment ? (
-                    <span className="loading loading-spinner loading-xs" />
-                  ) : (
-                    "Post"
-                  )}
-                </button>
-              </form>
-            )}
+    {replyingTo && (
+      <div className="flex items-center justify-between mb-2 px-3 py-2 bg-primary/10 rounded-lg">
+        <p className="text-xs text-primary">
+          Replying to{" "}
+          <span className="font-semibold">
+            @{replyingTo.author?.username}
+          </span>
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            setReplyingTo(null);
+            setComment("");
+          }}
+          className="text-base-content/60 hover:text-error"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    )}
+
+    <div className="flex gap-2">
+
+      <input
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder={
+          replyingTo
+            ? `Reply to @${replyingTo.author?.username}...`
+            : "Write a comment..."
+        }
+        disabled={postingComment}
+        className="flex-1 border border-base-300 bg-base-100 text-base-content rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
+      />
+
+      <button
+        type="submit"
+        disabled={postingComment}
+        className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+      >
+        {postingComment ? (
+          <span className="loading loading-spinner loading-xs" />
+        ) : (
+          replyingTo ? "Reply" : "Post"
+        )}
+      </button>
+
+    </div>
+  </form>
+)}
 
             <div className="flex flex-col gap-4">
               {entry.comment?.map((c) => (

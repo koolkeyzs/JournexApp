@@ -169,6 +169,13 @@ const NotificationBell = ({ currentUser }) => {
                             </span>{" "}
                             commented on your entry
                           </span>
+                        ) : notification.type === "comment_reply" ? (
+                          <span>
+                            <span className="font-semibold">
+                              {notification.sender?.username || "Someone"}
+                            </span>{" "}
+                            replied to your comment
+                          </span>
                         ) : (
                           <span>
                             <span className="font-semibold">
