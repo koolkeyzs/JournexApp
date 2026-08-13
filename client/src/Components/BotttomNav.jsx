@@ -75,7 +75,7 @@ const BottomNav = () => {
 
                 {/* Journal */}
                 <button
-                    onClick={() => navigate("/entries")}
+                    onClick={() => navigate("/dashboard/private")}
                     className={`flex flex-col items-center justify-center gap-1 w-16 transition ${
                         isActive("/entries")
                             ? "text-primary"
@@ -84,7 +84,7 @@ const BottomNav = () => {
                 >
                     <BookOpen
                         size={22}
-                        strokeWidth={isActive("/entries") ? 2.5 : 2}
+                        strokeWidth={isActive("/dashboard/private") ? 2.5 : 2}
                     />
 
                     <span className="text-[11px] font-medium">
@@ -94,7 +94,7 @@ const BottomNav = () => {
 
                 {/* Create button */}
                 <button
-                    onClick={() => navigate("/entries/new")}
+                    onClick={() => navigate("/entries")}
                     className="
                         relative
                         -mt-7
@@ -121,7 +121,7 @@ const BottomNav = () => {
 
                 {/* Community */}
                 <button
-                    onClick={() => navigate("/community")}
+                    onClick={() => navigate("/dashboard/community")}
                     className={`flex flex-col items-center justify-center gap-1 w-16 transition ${
                         isActive("/community")
                             ? "text-primary"
@@ -130,7 +130,7 @@ const BottomNav = () => {
                 >
                     <Users
                         size={22}
-                        strokeWidth={isActive("/community") ? 2.5 : 2}
+                        strokeWidth={isActive("/dashboard/community") ? 2.5 : 2}
                     />
 
                     <span className="text-[11px] font-medium">
