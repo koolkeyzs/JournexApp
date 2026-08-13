@@ -48,9 +48,8 @@ const commentSchema = joi.object({
         text: joi.string().required().escapeHTML(),
 
         parentComment: joi.string()
-            .allow(null)
+            .allow(null , '')
             .optional()
     }).required()
 })
-
 module.exports = { entrySchema, commentSchema }
