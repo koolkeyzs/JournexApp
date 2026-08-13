@@ -22,9 +22,16 @@ import AdminEntries from "./pages/AdminEntries";
 import AdminComments from "./pages/AdminComments";
 import AdminAnnouncement from "./pages/AdminAnnouncement";
 import Settings from "./pages/Settings";
+import SplashScreen from "./Components/SplashScreen";
+import { useState } from "react";
 // import EditComment from "./pages/EditComment";
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+if (showSplash) {
+  return <SplashScreen onFinish={() => setShowSplash(false)} />;
+}
   return (
     <AnimatePresence mode="wait">
       <Routes>
