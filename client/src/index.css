@@ -5,3 +5,17 @@
 @plugin "daisyui"{
   themes: light --default , dark;
 }
+
+@keyframes repliesIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-replies-in {
+  animation: repliesIn 0.25s ease-out;
+}
