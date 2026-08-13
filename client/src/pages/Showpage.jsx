@@ -45,6 +45,8 @@ export default function ShowPage() {
   const [entry, setEntry] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [comment, setComment] = useState("");
+  const [postingComment, setPostingComment] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editText, setEditText] = useState("");
   const [deletingImage, setDeletingImage] = useState(null);
@@ -108,8 +110,10 @@ export default function ShowPage() {
 
   const handleComment = async (e) => {
     e.preventDefault();
+    if (postingComment) return;
 
     try {
+      setPostingComment(true);
       await api.post(`/entries/${id}/comments`, {
         comment: { text: comment },
       });
@@ -118,17 +122,24 @@ export default function ShowPage() {
       setComment("");
       fetchData();
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || "Failed to add comment");
+    } finally {
+      setPostingComment(false);
     }
   };
 
   const handleDeleteComment = async (commentId) => {
+    if (deletingCommentId) return;
+
     try {
+      setDeletingCommentId(commentId);
       await api.delete(`/entries/${id}/comments/${commentId}`);
       toast.success("Comment deleted!");
       fetchData();
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || "Failed to delete comment");
+    } finally {
+      setDeletingCommentId(null);
     }
   };
 
@@ -495,11 +506,20 @@ export default function ShowPage() {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Write a comment..."
-                  className="flex-1 border border-base-300 bg-base-100 text-base-content rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                  disabled={postingComment}
+                  className="flex-1 border border-base-300 bg-base-100 text-base-content rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
                 />
 
-                <button className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition">
-                  Post
+                <button
+                  type="submit"
+                  disabled={postingComment}
+                  className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {postingComment ? (
+                    <span className="loading loading-spinner loading-xs" />
+                  ) : (
+                    "Post"
+                  )}
                 </button>
               </form>
             )}
@@ -510,14 +530,6 @@ export default function ShowPage() {
                   <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
                     {c.author?.username?.charAt(0).toUpperCase()}
                   </div>
-
-                  {/* {currentUser?.profilePic?.url ? (
-            <img src={currentUser.profilePic.url} className="rounded-full w-9 h-9 object-cover" />
-        ) : (
-            <span className="text-sm font-bold">
-                {currentUser?.username?.charAt(0).toUpperCase()}
-            </span>
-        )} */}
 
                   <div className="flex-1">
                     <span className="font-semibold text-primary">
@@ -572,9 +584,14 @@ export default function ShowPage() {
 
                         <button
                           onClick={() => handleDeleteComment(c._id)}
-                          className="text-error hover:opacity-80 transition"
+                          disabled={deletingCommentId === c._id}
+                          className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Trash2 size={18} />
+                          {deletingCommentId === c._id ? (
+                            <span className="loading loading-spinner loading-xs" />
+                          ) : (
+                            <Trash2 size={18} />
+                          )}
                         </button>
                       </div>
                     )}
