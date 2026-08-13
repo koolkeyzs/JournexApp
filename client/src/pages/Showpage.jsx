@@ -247,7 +247,7 @@ export default function ShowPage() {
 
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 pb-28"
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl w-full">
@@ -267,7 +267,7 @@ export default function ShowPage() {
         </div>
       )}
 
-      <div className="max-w-3xl mx-auto p-6">
+      <div className="max-w-3xl mx-auto p-6 pb-24">
         <Link
           to="/dashboard/community"
           className="inline-flex items-center gap-2 text-base-content/60 hover:text-primary text-sm mb-4 transition"
@@ -534,8 +534,15 @@ export default function ShowPage() {
             <div className="flex flex-col gap-4">
               {entry.comment?.map((c) => (
                 <div key={c._id} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                    {c.author?.username?.charAt(0).toUpperCase()}
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
+                    {c.author?.profilePic?.url ? (
+                      <img
+                        src={c.author.profilePic.url}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      c.author?.username?.charAt(0).toUpperCase()
+                    )}
                   </div>
 
                   <div className="flex-1">
@@ -648,8 +655,9 @@ export default function ShowPage() {
             </div>
           </div>
         )}
-        <BottomNav />
       </div>
+
+      <BottomNav />
     </PageTransition>
   );
 }
