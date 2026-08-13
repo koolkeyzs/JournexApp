@@ -49,16 +49,19 @@ const DailyRandVerse = ({ currentUser }) => {
                 backgroundImage: "url('/verse.png')",
             }}
         >
-            {/* Dark purple overlay for text readability */}
+            {/* Dark purple overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-purple-950/80 via-purple-900/65 to-black/75" />
 
             {/* Card content */}
-            <div className="relative z-10 p-6 sm:p-7">
+            <div className="relative z-10 p-6">
 
                 {/* Header */}
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4">
+
                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
-                        <span className="text-xl">📖</span>
+                        <span className="text-xl">
+                            📖
+                        </span>
                     </div>
 
                     <div>
@@ -70,34 +73,47 @@ const DailyRandVerse = ({ currentUser }) => {
                             Verse of the Day
                         </h3>
                     </div>
+
                 </div>
 
                 {/* Verse */}
-                <div className="mb-6">
-                    <p
-                        className="font-lora text-white text-xl sm:text-2xl italic leading-relaxed drop-shadow-md"
-                    >
+                <div className="mb-4">
+
+                    <p className="font-lora text-white text-xl sm:text-2xl italic leading-relaxed drop-shadow-md">
                         “{dailyVerse.text}”
                     </p>
 
                     <p className="font-lora text-white/90 font-medium mt-4 text-sm sm:text-base">
                         — {dailyVerse.reference}
                     </p>
+
                 </div>
 
-                {/* Actions */}
+                {/* Copy & Share */}
                 <div className="flex gap-3">
 
                     <button
                         onClick={handleCopy}
-                        className="flex-1 flex items-center justify-center gap-2
-                        bg-white/15 backdrop-blur-md
-                        border border-white/20
-                        text-white text-sm font-medium
-                        px-4 py-2.5 rounded-xl
-                        hover:bg-white/25
-                        active:scale-[0.98]
-                        transition"
+                        className="
+                            flex-1
+                            flex
+                            items-center
+                            justify-center
+                            gap-2
+                            bg-white/15
+                            backdrop-blur-sm
+                            border
+                            border-white/20
+                            text-white
+                            text-sm
+                            font-medium
+                            px-4
+                            py-2.5
+                            rounded-lg
+                            hover:bg-white/25
+                            active:scale-[0.98]
+                            transition
+                        "
                     >
                         <Copy size={17} />
                         Copy
@@ -105,14 +121,26 @@ const DailyRandVerse = ({ currentUser }) => {
 
                     <button
                         onClick={handleShare}
-                        className="flex-1 flex items-center justify-center gap-2
-                        bg-white/15 backdrop-blur-md
-                        border border-white/20
-                        text-white text-sm font-medium
-                        px-4 py-2.5 rounded-xl
-                        hover:bg-white/25
-                        active:scale-[0.98]
-                        transition"
+                        className="
+                            flex-1
+                            flex
+                            items-center
+                            justify-center
+                            gap-2
+                            bg-white/15
+                            backdrop-blur-sm
+                            border
+                            border-white/20
+                            text-white
+                            text-sm
+                            font-medium
+                            px-4
+                            py-2.5
+                            rounded-lg
+                            hover:bg-white/25
+                            active:scale-[0.98]
+                            transition
+                        "
                     >
                         <Share2 size={17} />
                         Share
