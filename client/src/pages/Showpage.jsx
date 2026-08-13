@@ -534,7 +534,13 @@ export default function ShowPage() {
             <div className="flex flex-col gap-4">
               {entry.comment?.map((c) => (
                 <div key={c._id} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
+                  <div
+                    className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden cursor-pointer"
+                    onClick={() =>
+                      c.author?.profilePic?.url &&
+                      setSelectedImage(c.author.profilePic.url)
+                    }
+                  >
                     {c.author?.profilePic?.url ? (
                       <img
                         src={c.author.profilePic.url}
@@ -546,9 +552,12 @@ export default function ShowPage() {
                   </div>
 
                   <div className="flex-1">
-                    <span className="font-semibold text-primary">
+                    <Link
+                      to={`/users/${c.author?._id}`}
+                      className="font-semibold text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary active:opacity-60 transition-colors"
+                    >
                       {c.author?.username}
-                    </span>
+                    </Link>
 
                     {editingCommentId === c._id ? (
                       <div className="flex gap-2 mt-1">
