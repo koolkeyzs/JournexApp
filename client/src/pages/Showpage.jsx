@@ -706,58 +706,9 @@ const toggleReplies = (commentId) => {
         }`}
   </button>
 )}
-                  </div>
 
-                  <div className="flex items-center gap-5 ml-auto">
-                    {/* Reply button — everyone can reply */}
-                    {currentUser && (
-                      <button
-                        onClick={() => {
-                          setReplyingTo(c);
-                          setComment("");
-                        }}
-                        className="text-primary hover:opacity-80 transition text-sm font-medium"
-                      >
-                        Reply
-                      </button>
-                    )}
 
-                    {/* Edit + Delete — owner/admin only */}
-                    {currentUser &&
-                      (c.author?._id?.toString() ===
-                        currentUser._id?.toString() ||
-                        currentUser.role === "admin") && (
-                        <>
-                          {c.author?._id?.toString() ===
-                            currentUser._id?.toString() &&
-                            editingCommentId !== c._id && (
-                              <button
-                                onClick={() => {
-                                  setEditingCommentId(c._id);
-                                  setEditText(c.text);
-                                }}
-                                className="text-primary hover:opacity-80 transition"
-                              >
-                                <SquarePen size={18} />
-                              </button>
-                            )}
-
-                          <button
-                            onClick={() => handleDeleteComment(c._id)}
-                            disabled={deletingCommentId === c._id}
-                            className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {deletingCommentId === c._id ? (
-                              <span className="loading loading-spinner loading-xs" />
-                            ) : (
-                              <Trash2 size={18} />
-                            )}
-                          </button>
-                        </>
-                      )}
-                  </div>
-
-                  {expandedReplies[c._id] &&
+      {expandedReplies[c._id] &&
   getThreadReplies(c._id).length > 0 && (
     <div className="mt-4 ml-8 pl-4 border-l-2 border-base-300 space-y-4">
       {getThreadReplies(c._id).map((reply) => (
@@ -809,6 +760,58 @@ const toggleReplies = (commentId) => {
       ))}
     </div>
   )}
+                  </div>
+
+                  <div className="flex items-center gap-5 ml-auto">
+                    {/* Reply button — everyone can reply */}
+                    {currentUser && (
+                      <button
+                        onClick={() => {
+                          setReplyingTo(c);
+                          setComment("");
+                        }}
+                        className="text-primary hover:opacity-80 transition text-sm font-medium"
+                      >
+                        Reply
+                      </button>
+                    )}
+
+                    {/* Edit + Delete — owner/admin only */}
+                    {currentUser &&
+                      (c.author?._id?.toString() ===
+                        currentUser._id?.toString() ||
+                        currentUser.role === "admin") && (
+                        <>
+                          {c.author?._id?.toString() ===
+                            currentUser._id?.toString() &&
+                            editingCommentId !== c._id && (
+                              <button
+                                onClick={() => {
+                                  setEditingCommentId(c._id);
+                                  setEditText(c.text);
+                                }}
+                                className="text-primary hover:opacity-80 transition"
+                              >
+                                <SquarePen size={18} />
+                              </button>
+                            )}
+
+                          <button
+                            onClick={() => handleDeleteComment(c._id)}
+                            disabled={deletingCommentId === c._id}
+                            className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {deletingCommentId === c._id ? (
+                              <span className="loading loading-spinner loading-xs" />
+                            ) : (
+                              <Trash2 size={18} />
+                            )}
+                          </button>
+                        </>
+                      )}
+                  </div>
+
+            
                 </div>
               ))}
             </div>
