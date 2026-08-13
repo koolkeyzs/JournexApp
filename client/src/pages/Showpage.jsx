@@ -112,40 +112,40 @@ export default function ShowPage() {
   };
 
   const handleComment = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (postingComment) return;
+    if (postingComment) return;
 
-  if (!comment.trim()) {
-    toast.error("Please write something first.");
-    return;
-  }
+    if (!comment.trim()) {
+      toast.error("Please write something first.");
+      return;
+    }
 
-  try {
-    setPostingComment(true);
+    try {
+      setPostingComment(true);
 
-    await api.post(`/entries/${id}/comments`, {
-      comment: {
-        text: comment,
-        parentComment: replyingTo?._id || null,
-      },
-    });
+      await api.post(`/entries/${id}/comments`, {
+        comment: {
+          text: comment,
+          parentComment: replyingTo?._id || null,
+        },
+      });
 
-    toast.success(replyingTo ? "Reply added!" : "Comment added!");
+      toast.success(replyingTo ? "Reply added!" : "Comment added!");
 
-    setComment("");
-    setReplyingTo(null);
+      setComment("");
+      setReplyingTo(null);
 
-    fetchData();
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message ||
-        (replyingTo ? "Failed to add reply" : "Failed to add comment")
-    );
-  } finally {
-    setPostingComment(false);
-  }
-};
+      fetchData();
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+          (replyingTo ? "Failed to add reply" : "Failed to add comment"),
+      );
+    } finally {
+      setPostingComment(false);
+    }
+  };
 
   const handleDeleteComment = async (commentId) => {
     if (deletingCommentId) return;
@@ -524,60 +524,59 @@ export default function ShowPage() {
               Comments ({entry.comment?.length || 0})
             </h3>
 
-           {currentUser && (
-  <form onSubmit={handleComment} className="mb-6">
+            {currentUser && (
+              <form onSubmit={handleComment} className="mb-6">
+                {replyingTo && (
+                  <div className="flex items-center justify-between mb-2 px-3 py-2 bg-primary/10 rounded-lg">
+                    <p className="text-xs text-primary">
+                      Replying to{" "}
+                      <span className="font-semibold">
+                        @{replyingTo.author?.username}
+                      </span>
+                    </p>
 
-    {replyingTo && (
-      <div className="flex items-center justify-between mb-2 px-3 py-2 bg-primary/10 rounded-lg">
-        <p className="text-xs text-primary">
-          Replying to{" "}
-          <span className="font-semibold">
-            @{replyingTo.author?.username}
-          </span>
-        </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplyingTo(null);
+                        setComment("");
+                      }}
+                      className="text-base-content/60 hover:text-error"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
 
-        <button
-          type="button"
-          onClick={() => {
-            setReplyingTo(null);
-            setComment("");
-          }}
-          className="text-base-content/60 hover:text-error"
-        >
-          <X size={16} />
-        </button>
-      </div>
-    )}
+                <div className="flex gap-2">
+                  <input
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder={
+                      replyingTo
+                        ? `Reply to @${replyingTo.author?.username}...`
+                        : "Write a comment..."
+                    }
+                    disabled={postingComment}
+                    className="flex-1 border border-base-300 bg-base-100 text-base-content rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
+                  />
 
-    <div className="flex gap-2">
-
-      <input
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder={
-          replyingTo
-            ? `Reply to @${replyingTo.author?.username}...`
-            : "Write a comment..."
-        }
-        disabled={postingComment}
-        className="flex-1 border border-base-300 bg-base-100 text-base-content rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
-      />
-
-      <button
-        type="submit"
-        disabled={postingComment}
-        className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
-      >
-        {postingComment ? (
-          <span className="loading loading-spinner loading-xs" />
-        ) : (
-          replyingTo ? "Reply" : "Post"
-        )}
-      </button>
-
-    </div>
-  </form>
-)}
+                  <button
+                    type="submit"
+                    disabled={postingComment}
+                    className="bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {postingComment ? (
+                      <span className="loading loading-spinner loading-xs" />
+                    ) : replyingTo ? (
+                      "Reply"
+                    ) : (
+                      "Post"
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
 
             <div className="flex flex-col gap-4">
               {entry.comment?.map((c) => (
@@ -641,38 +640,54 @@ export default function ShowPage() {
                     )}
                   </div>
 
-                  {currentUser &&
-                    (c.author?._id?.toString() ===
-                      currentUser._id?.toString() ||
-                      currentUser.role === "admin") && (
-                      <div className="flex items-center gap-5 ml-auto">
-                        {c.author?._id?.toString() ===
-                          currentUser._id?.toString() &&
-                          editingCommentId !== c._id && (
-                            <button
-                              onClick={() => {
-                                setEditingCommentId(c._id);
-                                setEditText(c.text);
-                              }}
-                              className="text-primary hover:opacity-80 transition"
-                            >
-                              <SquarePen size={18} />
-                            </button>
-                          )}
-
-                        <button
-                          onClick={() => handleDeleteComment(c._id)}
-                          disabled={deletingCommentId === c._id}
-                          className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {deletingCommentId === c._id ? (
-                            <span className="loading loading-spinner loading-xs" />
-                          ) : (
-                            <Trash2 size={18} />
-                          )}
-                        </button>
-                      </div>
+                  <div className="flex items-center gap-5 ml-auto">
+                    {/* Reply button — everyone can reply */}
+                    {currentUser && (
+                      <button
+                        onClick={() => {
+                          setReplyingTo(c);
+                          setComment("");
+                        }}
+                        className="text-primary hover:opacity-80 transition text-sm font-medium"
+                      >
+                        Reply
+                      </button>
                     )}
+
+                    {/* Edit + Delete — owner/admin only */}
+                    {currentUser &&
+                      (c.author?._id?.toString() ===
+                        currentUser._id?.toString() ||
+                        currentUser.role === "admin") && (
+                        <>
+                          {c.author?._id?.toString() ===
+                            currentUser._id?.toString() &&
+                            editingCommentId !== c._id && (
+                              <button
+                                onClick={() => {
+                                  setEditingCommentId(c._id);
+                                  setEditText(c.text);
+                                }}
+                                className="text-primary hover:opacity-80 transition"
+                              >
+                                <SquarePen size={18} />
+                              </button>
+                            )}
+
+                          <button
+                            onClick={() => handleDeleteComment(c._id)}
+                            disabled={deletingCommentId === c._id}
+                            className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {deletingCommentId === c._id ? (
+                              <span className="loading loading-spinner loading-xs" />
+                            ) : (
+                              <Trash2 size={18} />
+                            )}
+                          </button>
+                        </>
+                      )}
+                  </div>
                 </div>
               ))}
             </div>
