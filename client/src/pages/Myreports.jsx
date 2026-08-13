@@ -7,6 +7,7 @@ import SideBar from "../Components/Dashboard/sidebar";
 import TopBar from "../Components/Dashboard/navbar";
 import { Flag, ExternalLink, ShieldCheck } from "lucide-react";
 import LoadingScreen from "../Components/LoadingScreen";
+import BottomNav from "../Components/BotttomNav";
 
 const statusStyles = {
   pending: {
@@ -135,6 +136,7 @@ export default function MyReports() {
             )}
           </div>
         </div>
+        <BottomNav/>
       </div>
     </PageTransition>
   );

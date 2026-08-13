@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 
 import { subscribeToPush } from '../utils/pushNotification'
+import BottomNav from '../Components/BotttomNav'
 
 function SettingsPage() {
     const navigate = useNavigate()
@@ -248,6 +249,7 @@ function SettingsPage() {
 
                     </div>
                 </div>
+                <BottomNav/>
             </div>
         </PageTransition>
     )

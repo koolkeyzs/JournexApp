@@ -14,6 +14,7 @@ import {
     MessageCircle
 } from "lucide-react";
 import LoadingScreen from "../Components/LoadingScreen";
+import BottomNav from "../Components/BotttomNav";
 
 export default function AdminDashboard() {
 
@@ -118,7 +119,7 @@ export default function AdminDashboard() {
             </div>
 
             <AdminSidebar />
-
+<BottomNav/>
         </div>
          </PageTransition>
     );

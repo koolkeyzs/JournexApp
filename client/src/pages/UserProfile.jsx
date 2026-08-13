@@ -14,6 +14,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import BottomNav from "../Components/BotttomNav";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState({});
@@ -317,6 +318,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+        <BottomNav/>
       </div>
     </PageTransition>
   );

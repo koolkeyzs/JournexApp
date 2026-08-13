@@ -8,6 +8,7 @@ import TopBar from "../Components/Dashboard/navbar";
 import GridEntryCard from "../Components/privateGrid";
 import { BookOpen } from "lucide-react";
 import LoadingScreen from "../Components/LoadingScreen";
+import BottomNav from "../Components/BotttomNav";
 
 export default function PrivateEntries() {
   const [entries, setEntries] = useState([]);
@@ -77,6 +78,7 @@ export default function PrivateEntries() {
             )}
           </div>
         </div>
+        <BottomNav/>
       </div>
     </PageTransition>
   );

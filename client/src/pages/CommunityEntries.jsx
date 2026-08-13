@@ -11,6 +11,7 @@ import { Users } from "lucide-react";
 import DailyRandVerse from "../Components/Dashboard/DailyRandVerse";
 import LoadingScreen from "../Components/LoadingScreen";
 import AnnouncementBanner from "../Components/admin/AnnouncementBanner";
+import BottomNav from "../Components/BotttomNav";
 
 export default function CommunityFeed() {
   const [entries, setEntries] = useState([]);
@@ -77,6 +78,7 @@ export default function CommunityFeed() {
             )}
           </div>
         </div>
+        <BottomNav/>
       </div>
     </PageTransition>
   );
