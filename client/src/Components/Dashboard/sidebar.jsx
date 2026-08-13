@@ -96,7 +96,7 @@ const SideBar = ({ currentUser }) => {
     <>
       {/* Hamburger button - mobile only */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 btn btn-ghost btn-sm"
+        className="md:hidden fixed top-4 left-4 z-70 btn btn-ghost btn-sm"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
