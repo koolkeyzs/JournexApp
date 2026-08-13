@@ -257,6 +257,124 @@ export default function ShowPage() {
     entry.author._id?.toString() === currentUser._id?.toString();
   const isAdmin = currentUser?.role === "admin";
 
+
+
+  // Separate top-level comments from replies, then attach each reply to its parent
+const topLevelComments = entry.comment?.filter(c => !c.parentComment) || [];
+const getReplies = (parentId) =>
+    entry.comment?.filter(c => c.parentComment === parentId) || [];
+
+
+
+
+const CommentItem = ({
+    c,
+    currentUser,
+    isReply,
+    editingCommentId,
+    setEditingCommentId,
+    editText,
+    setEditText,
+    savingCommentId,
+    handleEditComment,
+    deletingCommentId,
+    handleDeleteComment,
+    setReplyingTo,
+    setComment,
+    setSelectedImage,
+}) => (
+    <div className={`flex gap-3 ${isReply ? "ml-10 mt-3" : ""}`}>
+        <div
+            className={`${isReply ? "w-6 h-6" : "w-8 h-8"} rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden cursor-pointer`}
+            onClick={() => c.author?.profilePic?.url && setSelectedImage(c.author.profilePic.url)}
+        >
+            {c.author?.profilePic?.url ? (
+                <img src={c.author.profilePic.url} className="w-full h-full object-cover" />
+            ) : (
+                c.author?.username?.charAt(0).toUpperCase()
+            )}
+        </div>
+
+        <div className="flex-1">
+            <Link
+                to={`/users/${c.author?._id}`}
+                className="font-semibold text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary active:opacity-60 transition-colors text-sm"
+            >
+                {c.author?.username}
+            </Link>
+
+            {editingCommentId === c._id ? (
+                <div className="flex gap-2 mt-1">
+                    <input
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        disabled={savingCommentId === c._id}
+                        className="flex-1 border border-primary/30 bg-base-100 text-base-content rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
+                    />
+                    <button
+                        onClick={() => handleEditComment(c._id)}
+                        disabled={savingCommentId === c._id}
+                        className="bg-primary text-primary-content text-xs px-3 py-1 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1.5"
+                    >
+                        {savingCommentId === c._id ? <span className="loading loading-spinner loading-xs" /> : "Save"}
+                    </button>
+                    <button
+                        onClick={() => setEditingCommentId(null)}
+                        disabled={savingCommentId === c._id}
+                        className="bg-base-200 text-base-content text-xs px-3 py-1 rounded-lg hover:bg-base-300 transition disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            ) : (
+                <p className="text-base-content/80 text-sm">{c.text}</p>
+            )}
+        </div>
+
+        <div className="flex items-center gap-4 ml-auto">
+            {currentUser && (
+                <button
+                    onClick={() => {
+                        setReplyingTo(c);
+                        setComment("");
+                    }}
+                    className="text-primary hover:opacity-80 transition text-xs font-medium"
+                >
+                    Reply
+                </button>
+            )}
+
+            {currentUser &&
+                (c.author?._id?.toString() === currentUser._id?.toString() || currentUser.role === "admin") && (
+                    <>
+                        {c.author?._id?.toString() === currentUser._id?.toString() && editingCommentId !== c._id && (
+                            <button
+                                onClick={() => {
+                                    setEditingCommentId(c._id);
+                                    setEditText(c.text);
+                                }}
+                                className="text-primary hover:opacity-80 transition"
+                            >
+                                <SquarePen size={16} />
+                            </button>
+                        )}
+                        <button
+                            onClick={() => handleDeleteComment(c._id)}
+                            disabled={deletingCommentId === c._id}
+                            className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {deletingCommentId === c._id ? (
+                                <span className="loading loading-spinner loading-xs" />
+                            ) : (
+                                <Trash2 size={16} />
+                            )}
+                        </button>
+                    </>
+                )}
+        </div>
+    </div>
+);
+
   return (
     <PageTransition>
       <SideBar currentUser={currentUser} />
@@ -578,119 +696,49 @@ export default function ShowPage() {
               </form>
             )}
 
-            <div className="flex flex-col gap-4">
-              {entry.comment?.map((c) => (
-                <div key={c._id} className="flex gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden cursor-pointer"
-                    onClick={() =>
-                      c.author?.profilePic?.url &&
-                      setSelectedImage(c.author.profilePic.url)
-                    }
-                  >
-                    {c.author?.profilePic?.url ? (
-                      <img
-                        src={c.author.profilePic.url}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      c.author?.username?.charAt(0).toUpperCase()
-                    )}
-                  </div>
+           <div className="flex flex-col gap-5">
+    {topLevelComments.map((c) => (
+        <div key={c._id}>
+            <CommentItem
+                c={c}
+                currentUser={currentUser}
+                isReply={false}
+                editingCommentId={editingCommentId}
+                setEditingCommentId={setEditingCommentId}
+                editText={editText}
+                setEditText={setEditText}
+                savingCommentId={savingCommentId}
+                handleEditComment={handleEditComment}
+                deletingCommentId={deletingCommentId}
+                handleDeleteComment={handleDeleteComment}
+                setReplyingTo={setReplyingTo}
+                setComment={setComment}
+                setSelectedImage={setSelectedImage}
+            />
 
-                  <div className="flex-1">
-                    <Link
-                      to={`/users/${c.author?._id}`}
-                      className="font-semibold text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary active:opacity-60 transition-colors"
-                    >
-                      {c.author?.username}
-                    </Link>
-
-                    {editingCommentId === c._id ? (
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          value={editText}
-                          onChange={(e) => setEditText(e.target.value)}
-                          disabled={savingCommentId === c._id}
-                          className="flex-1 border border-primary/30 bg-base-100 text-base-content rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-primary disabled:opacity-60"
-                        />
-
-                        <button
-                          onClick={() => handleEditComment(c._id)}
-                          disabled={savingCommentId === c._id}
-                          className="bg-primary text-primary-content text-xs px-3 py-1 rounded-lg hover:bg-primary/90 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1.5"
-                        >
-                          {savingCommentId === c._id ? (
-                            <span className="loading loading-spinner loading-xs" />
-                          ) : (
-                            "Save"
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => setEditingCommentId(null)}
-                          disabled={savingCommentId === c._id}
-                          className="bg-base-200 text-base-content text-xs px-3 py-1 rounded-lg hover:bg-base-300 transition disabled:opacity-50"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <p className="text-base-content/80 text-sm">{c.text}</p>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-5 ml-auto">
-                    {/* Reply button — everyone can reply */}
-                    {currentUser && (
-                      <button
-                        onClick={() => {
-                          setReplyingTo(c);
-                          setComment("");
-                        }}
-                        className="text-primary hover:opacity-80 transition text-sm font-medium"
-                      >
-                        Reply
-                      </button>
-                    )}
-
-                    {/* Edit + Delete — owner/admin only */}
-                    {currentUser &&
-                      (c.author?._id?.toString() ===
-                        currentUser._id?.toString() ||
-                        currentUser.role === "admin") && (
-                        <>
-                          {c.author?._id?.toString() ===
-                            currentUser._id?.toString() &&
-                            editingCommentId !== c._id && (
-                              <button
-                                onClick={() => {
-                                  setEditingCommentId(c._id);
-                                  setEditText(c.text);
-                                }}
-                                className="text-primary hover:opacity-80 transition"
-                              >
-                                <SquarePen size={18} />
-                              </button>
-                            )}
-
-                          <button
-                            onClick={() => handleDeleteComment(c._id)}
-                            disabled={deletingCommentId === c._id}
-                            className="text-error hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {deletingCommentId === c._id ? (
-                              <span className="loading loading-spinner loading-xs" />
-                            ) : (
-                              <Trash2 size={18} />
-                            )}
-                          </button>
-                        </>
-                      )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* Nested replies, indented under the parent */}
+            {getReplies(c._id).map((reply) => (
+                <CommentItem
+                    key={reply._id}
+                    c={reply}
+                    currentUser={currentUser}
+                    isReply={true}
+                    editingCommentId={editingCommentId}
+                    setEditingCommentId={setEditingCommentId}
+                    editText={editText}
+                    setEditText={setEditText}
+                    savingCommentId={savingCommentId}
+                    handleEditComment={handleEditComment}
+                    deletingCommentId={deletingCommentId}
+                    handleDeleteComment={handleDeleteComment}
+                    setReplyingTo={setReplyingTo}
+                    setComment={setComment}
+                    setSelectedImage={setSelectedImage}
+                />
+            ))}
+        </div>
+    ))}
+</div>
           </div>
         )}
         {showReportModal && (
