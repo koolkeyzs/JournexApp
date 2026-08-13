@@ -24,21 +24,15 @@ self.addEventListener("notificationclick", (event) => {
       type: "window",
       includeUncontrolled: true,
     }).then((clientList) => {
-
-      // If Journex is already open, focus it
       for (const client of clientList) {
         if ("focus" in client) {
           return client.focus();
         }
       }
 
-      // If Journex isn't open, open it at its root
       if (clients.openWindow) {
-        return clients.openWindow("/");
+        return clients.openWindow("https://journex-app.vercel.app/");
       }
     })
   );
 });
-
-
-
