@@ -139,6 +139,7 @@ store.on("error", function (e) {
 // ============================================
 // SESSION
 // ============================================
+app.set('trust proxy' , 1)
 
 const sessionConfig = {
   store,
