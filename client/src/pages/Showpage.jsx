@@ -58,7 +58,7 @@ export default function ShowPage() {
   const [deletingEntry, setDeletingEntry] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState(null);
-
+const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
@@ -98,6 +98,15 @@ export default function ShowPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        fetchData();
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(interval);
+}, [id]);
 
   // =========================
   // LIKE
@@ -651,21 +660,15 @@ export default function ShowPage() {
             </Link>
           )}
 
-          {(isOwner || isAdmin) && (
-            <button
-              onClick={handleDelete}
-              disabled={deletingEntry}
-              className="flex items-center gap-1.5 bg-error/10 text-error text-sm font-medium px-4 py-2 rounded-lg hover:bg-error/20 active:scale-95 transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {deletingEntry ? (
-                <span className="loading loading-spinner loading-xs" />
-              ) : (
-                <Trash2 size={15} />
-              )}
-
-              {deletingEntry ? "Deleting..." : "Delete"}
-            </button>
-          )}
+         {(isOwner || isAdmin) && (
+    <button
+        onClick={() => setShowDeleteModal(true)}
+        className="flex items-center gap-1.5 bg-error/10 text-error text-sm font-medium px-4 py-2 rounded-lg hover:bg-error/20 active:scale-95 transition-all duration-150"
+    >
+        <Trash2 size={15} />
+        Delete
+    </button>
+)}
         </div>
 
         {/* =========================
@@ -916,6 +919,43 @@ export default function ShowPage() {
             </div>
           </div>
         )}
+
+
+
+
+        {showDeleteModal && (
+    <div className="modal modal-open">
+        <div className="modal-box">
+            <h3 className="font-bold text-lg">Delete this entry?</h3>
+
+            <p className="text-sm text-base-content/60 mt-3">
+                This action can't be undone. Your entry, its images, and all comments will be permanently removed.
+            </p>
+
+            <div className="modal-action">
+                <button
+                    className="btn"
+                    disabled={deletingEntry}
+                    onClick={() => setShowDeleteModal(false)}
+                >
+                    Cancel
+                </button>
+
+                <button
+                    className="btn btn-error"
+                    disabled={deletingEntry}
+                    onClick={handleDelete}
+                >
+                    {deletingEntry ? (
+                        <span className="loading loading-spinner loading-xs" />
+                    ) : (
+                        "Delete Entry"
+                    )}
+                </button>
+            </div>
+        </div>
+    </div>
+)}
       </div>
 
       <BottomNav />
