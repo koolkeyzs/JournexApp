@@ -39,6 +39,14 @@ export default function CommunityFeed() {
     fetchData();
   }, []);
 
+useEffect(() => {
+    const interval = setInterval(() => {
+        fetchData(false);
+    }, 15000);
+
+    return () => clearInterval(interval);
+}, []);
+  
   return (
     <PageTransition>
       <div className="flex bg-base-200 min-h-screen pb-28">

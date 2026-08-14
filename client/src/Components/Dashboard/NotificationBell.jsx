@@ -71,23 +71,25 @@ const NotificationBell = ({ currentUser }) => {
   };
 
   const handleNotificationClick = async (notification) => {
-    try {
-      await api.patch(`/notifications/${notification._id}/read`);
-      setNotifications((prev) =>
-        prev.map((item) =>
-          item._id === notification._id ? { ...item, read: true } : item,
-        ),
-      );
-      setUnreadCount((prev) => Math.max(prev - 1, 0));
-    } catch (err) {
-      console.log(err);
+    // navigate first — don't wait for the patch
+    if (notification.entry?._id) {
+        navigate(`/entries/${notification.entry._id}`)
+        setIsOpen(false)
     }
 
-    if (notification.entry?._id) {
-      navigate(`/entries/${notification.entry._id}`);
-      setIsOpen(false);
+    // then mark as read in background
+    try {
+        await api.patch(`/notifications/${notification._id}/read`)
+        setNotifications((prev) =>
+            prev.map((item) =>
+                item._id === notification._id ? { ...item, read: true } : item
+            )
+        )
+        setUnreadCount((prev) => Math.max(prev - 1, 0))
+    } catch (err) {
+        console.log(err)
     }
-  };
+}
 
   return (
     <div className="relative" ref={dropdownRef}>
