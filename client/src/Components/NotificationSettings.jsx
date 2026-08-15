@@ -54,27 +54,6 @@ function NotificationSettings() {
     }
 
 
-    const handleReset = async () => {
-    try {
-        setLoading(true)
-        const registration = await navigator.serviceWorker.ready
-        const subscription = await registration.pushManager.getSubscription()
-        
-        if(subscription) {
-            await subscription.unsubscribe() // remove old subscription
-            console.log('Unsubscribed!')
-        }
-        
-        setEnabled(false)
-        setMessage('Reset successful! Click Enable to subscribe again.')
-        setError(false)
-    } catch(err) {
-        console.log(err)
-    } finally {
-        setLoading(false)
-    }
-}
-
     return (
         <div className="max-w-2xl">
 
@@ -137,50 +116,53 @@ function NotificationSettings() {
 
 
                 {/* Action */}
-               {/* Action */}
-<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-    <div className="text-sm text-gray-500">
-        {enabled
-            ? 'You will receive Journex notifications on this device.'
-            : 'Enable notifications to stay updated.'}
-    </div>
+                    <div className="text-sm text-gray-500">
+                        {enabled
+                            ? 'You will receive Journex notifications on this device.'
+                            : 'Enable notifications to stay updated.'}
+                    </div>
 
-    {/* Wrap both buttons */}
-    <div className="flex flex-col items-end gap-2">
-        <button
-            type="button"
-            onClick={handleEnableNotifications}
-            disabled={loading || enabled}
-            className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200
-                ${enabled
-                    ? 'cursor-default bg-green-100 text-green-700'
-                    : 'bg-purple-600 text-white hover:bg-purple-700 active:scale-95'
-                }
-                ${loading ? 'cursor-wait opacity-70' : ''}
-            `}
-        >
-            {loading ? (
-                <><Loader2 className="h-4 w-4 animate-spin" />Enabling...</>
-            ) : enabled ? (
-                <><CheckCircle2 className="h-4 w-4" />Notifications Enabled</>
-            ) : (
-                <><Bell className="h-4 w-4" />Enable Notifications</>
-            )}
-        </button>
 
-        {/* Reset button below main button */}
-        {enabled && (
-            <button
-                onClick={handleReset}
-                className="text-xs text-red-400 hover:text-red-600 hover:underline"
-            >
-                Reset & Re-enable
-            </button>
-        )}
-    </div>
+                    <button
+                        type="button"
+                        onClick={handleEnableNotifications}
+                        disabled={loading || enabled}
+                        className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200
+                            ${
+                                enabled
+                                    ? 'cursor-default bg-green-100 text-green-700'
+                                    : 'bg-purple-600 text-white hover:bg-purple-700 active:scale-95'
+                            }
+                            ${
+                                loading
+                                    ? 'cursor-wait opacity-70'
+                                    : ''
+                            }
+                        `}
+                    >
 
-</div>
+                        {loading ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Enabling...
+                            </>
+                        ) : enabled ? (
+                            <>
+                                <CheckCircle2 className="h-4 w-4" />
+                                Notifications Enabled
+                            </>
+                        ) : (
+                            <>
+                                <Bell className="h-4 w-4" />
+                                Enable Notifications
+                            </>
+                        )}
+
+                    </button>
+
+                </div>
 
 
                 {/* Success / Error Message */}
