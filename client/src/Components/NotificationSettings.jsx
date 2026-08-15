@@ -137,62 +137,50 @@ function NotificationSettings() {
 
 
                 {/* Action */}
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+               {/* Action */}
+<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-                    <div className="text-sm text-gray-500">
-                        {enabled
-                            ? 'You will receive Journex notifications on this device.'
-                            : 'Enable notifications to stay updated.'}
-                    </div>
+    <div className="text-sm text-gray-500">
+        {enabled
+            ? 'You will receive Journex notifications on this device.'
+            : 'Enable notifications to stay updated.'}
+    </div>
 
+    {/* Wrap both buttons */}
+    <div className="flex flex-col items-end gap-2">
+        <button
+            type="button"
+            onClick={handleEnableNotifications}
+            disabled={loading || enabled}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200
+                ${enabled
+                    ? 'cursor-default bg-green-100 text-green-700'
+                    : 'bg-purple-600 text-white hover:bg-purple-700 active:scale-95'
+                }
+                ${loading ? 'cursor-wait opacity-70' : ''}
+            `}
+        >
+            {loading ? (
+                <><Loader2 className="h-4 w-4 animate-spin" />Enabling...</>
+            ) : enabled ? (
+                <><CheckCircle2 className="h-4 w-4" />Notifications Enabled</>
+            ) : (
+                <><Bell className="h-4 w-4" />Enable Notifications</>
+            )}
+        </button>
 
-                    <button
-                        type="button"
-                        onClick={handleEnableNotifications}
-                        disabled={loading || enabled}
-                        className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200
-                            ${
-                                enabled
-                                    ? 'cursor-default bg-green-100 text-green-700'
-                                    : 'bg-purple-600 text-white hover:bg-purple-700 active:scale-95'
-                            }
-                            ${
-                                loading
-                                    ? 'cursor-wait opacity-70'
-                                    : ''
-                            }
-                        `}
-                    >
+        {/* Reset button below main button */}
+        {enabled && (
+            <button
+                onClick={handleReset}
+                className="text-xs text-red-400 hover:text-red-600 hover:underline"
+            >
+                Reset & Re-enable
+            </button>
+        )}
+    </div>
 
-                        {loading ? (
-                            <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                Enabling...
-                            </>
-                        ) : enabled ? (
-                            <>
-                                <CheckCircle2 className="h-4 w-4" />
-                                Notifications Enabled
-                            </>
-                        ) : (
-                            <>
-                                <Bell className="h-4 w-4" />
-                                Enable Notifications
-                            </>
-                        )}
-
-                    </button>
-
-                    {enabled && (
-    <button
-        onClick={handleReset}
-        className="text-xs text-red-500 hover:underline mt-2"
-    >
-        Reset notifications
-    </button>
-)}
-
-                </div>
+</div>
 
 
                 {/* Success / Error Message */}
