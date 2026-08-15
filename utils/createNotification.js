@@ -38,10 +38,13 @@ module.exports = async function createNotification({
     }
 
     // 4. Send browser push notification
-    const payload = JSON.stringify({
-        title: title || 'Journex',
-        body: body || 'You have a new notification'
-    })
+   const payload = JSON.stringify({
+    title: title || 'Journex',
+    body: body || 'You have a new notification',
+    data: {
+        url: entry ? `https://journex-app.vercel.app/entries/${entry}` : 'https://journex-app.vercel.app/'
+    }
+})
 
     try {
         await webpush.sendNotification(

@@ -53,6 +53,28 @@ function NotificationSettings() {
         }
     }
 
+
+    const handleReset = async () => {
+    try {
+        setLoading(true)
+        const registration = await navigator.serviceWorker.ready
+        const subscription = await registration.pushManager.getSubscription()
+        
+        if(subscription) {
+            await subscription.unsubscribe() // remove old subscription
+            console.log('Unsubscribed!')
+        }
+        
+        setEnabled(false)
+        setMessage('Reset successful! Click Enable to subscribe again.')
+        setError(false)
+    } catch(err) {
+        console.log(err)
+    } finally {
+        setLoading(false)
+    }
+}
+
     return (
         <div className="max-w-2xl">
 
@@ -160,6 +182,15 @@ function NotificationSettings() {
                         )}
 
                     </button>
+
+                    {enabled && (
+    <button
+        onClick={handleReset}
+        className="text-xs text-red-500 hover:underline mt-2"
+    >
+        Reset notifications
+    </button>
+)}
 
                 </div>
 

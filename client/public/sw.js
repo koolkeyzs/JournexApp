@@ -16,8 +16,32 @@ self.addEventListener('push' , (event)=>{
 })
 
 
+// self.addEventListener("notificationclick", (event) => {
+//   event.notification.close();
+
+//   event.waitUntil(
+//     clients.matchAll({
+//       type: "window",
+//       includeUncontrolled: true,
+//     }).then((clientList) => {
+//       for (const client of clientList) {
+//         if ("focus" in client) {
+//           return client.focus();
+//         }
+//       }
+
+//       if (clients.openWindow) {
+//         return clients.openWindow("https://journex-app.vercel.app/");
+//       }
+//     })
+//   );
+// });
+
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
+  
+  const url = event.notification.data?.url || "https://journex-app.vercel.app/"
 
   event.waitUntil(
     clients.matchAll({
@@ -25,13 +49,12 @@ self.addEventListener("notificationclick", (event) => {
       includeUncontrolled: true,
     }).then((clientList) => {
       for (const client of clientList) {
-        if ("focus" in client) {
-          return client.focus();
+        if (client.url === url && "focus" in client) {
+          return client.focus()
         }
       }
-
       if (clients.openWindow) {
-        return clients.openWindow("https://journex-app.vercel.app/");
+        return clients.openWindow(url)
       }
     })
   );
